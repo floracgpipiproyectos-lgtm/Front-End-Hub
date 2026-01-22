@@ -25,8 +25,19 @@ export const gamificationService = {
   },
 
   /**
-   * Obtener progreso del usuario
-   * @returns {Promise} Datos de progreso (nivel, XP, metas, etc.)
+   * Obtiene el progreso completo del usuario en el sistema de gamificación.
+   * Incluye nivel actual, puntos de experiencia (XP), metas y estadísticas.
+   * 
+   * @returns {Promise<{level: number, currentXP: number, nextLevelXP: number, 
+   *                    totalXP: number, badgesEarned: number, 
+   *                    projectsCompleted: number, goals: Array, 
+   *                    progressPercentage: number}>} 
+   *          Objeto con todos los datos de progreso del usuario
+   * @throws {Error} Si el usuario no está autenticado
+   * 
+   * @example
+   * const progress = await gamificationService.getProgress()
+   * console.log(`Nivel ${progress.level} - ${progress.currentXP}/${progress.nextLevelXP} XP`)
    */
   getProgress: async () => {
     const response = await apiClient.get(GAMIFICATION_ENDPOINTS.GET_PROGRESS)

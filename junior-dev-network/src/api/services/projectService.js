@@ -7,9 +7,25 @@ import { PROJECT_ENDPOINTS, buildEndpoint } from '@/constants/apiEndpoints'
  */
 export const projectService = {
   /**
-   * Obtener todos los proyectos
-   * @param {Object} filters - Filtros (page, limit, skills, level, etc.)
-   * @returns {Promise} Lista de proyectos
+   * Obtiene todos los proyectos disponibles con filtros opcionales.
+   * Soporta paginación y filtrado por skills, nivel de dificultad, tipo, etc.
+   * 
+   * @param {Object} [filters={}] - Filtros y opciones de paginación
+   * @param {number} [filters.page=1] - Número de página
+   * @param {number} [filters.limit=10] - Cantidad de resultados por página
+   * @param {Array<string>} [filters.skills] - Skills requeridas para filtrar proyectos
+   * @param {string} [filters.level] - Nivel: 'beginner', 'intermediate', 'advanced'
+   * @param {string} [filters.type] - Tipo: 'open-source', 'freelance', 'challenge'
+   * @returns {Promise<{projects: Array, total: number, page: number, limit: number}>} 
+   *          Objeto con array de proyectos y metadatos de paginación
+   * 
+   * @example
+   * const { projects } = await projectService.getAllProjects({
+   *   skills: ['React', 'JavaScript'],
+   *   level: 'beginner',
+   *   page: 1,
+   *   limit: 20
+   * })
    */
   getAllProjects: async (filters = {}) => {
     const response = await apiClient.get(PROJECT_ENDPOINTS.GET_ALL, {
@@ -30,9 +46,21 @@ export const projectService = {
   },
 
   /**
-   * Obtener proyectos recomendados para el usuario
-   * @param {Object} options - Opciones de recomendación
-   * @returns {Promise} Lista de proyectos recomendados
+   * Obtiene proyectos recomendados personalizados para el usuario actual.
+   * Utiliza el algoritmo de matching basado en skills del usuario y nivel de experiencia.
+   * 
+   * @param {Object} [options={}] - Opciones de recomendación
+   * @param {number} [options.limit=10] - Número máximo de recomendaciones
+   * @param {boolean} [options.includeJoined=false] - Incluir proyectos en los que ya está unido
+   * @returns {Promise<Array<{id: string, title: string, description: string, 
+   *                          skills: Array, level: string, matchScore: number, 
+   *                          type: string, url: string}>>} 
+   *          Array de proyectos recomendados ordenados por relevancia
+   * @throws {Error} Si el usuario no está autenticado o no tiene CV analizado
+   * 
+   * @example
+   * const recommended = await projectService.getRecommendedProjects({ limit: 5 })
+   * console.log('Proyectos recomendados:', recommended)
    */
   getRecommendedProjects: async (options = {}) => {
     const response = await apiClient.get(PROJECT_ENDPOINTS.GET_RECOMMENDED, {
@@ -78,9 +106,17 @@ export const projectService = {
   },
 
   /**
-   * Unirse a un proyecto
-   * @param {string} projectId - ID del proyecto
-   * @returns {Promise} Confirmación de unión
+   * Permite al usuario unirse a un proyecto.
+   * Agrega el proyecto a la lista de proyectos activos del usuario.
+   * 
+   * @param {string} projectId - ID único del proyecto al que se desea unir
+   * @returns {Promise<{message: string, project: Object, joinedAt: string}>} 
+   *          Confirmación de unión con datos del proyecto y fecha
+   * @throws {Error} Si el proyecto no existe, ya está unido, o requiere permisos especiales
+   * 
+   * @example
+   * await projectService.joinProject('project-123')
+   * // Proyecto agregado a la lista de proyectos activos
    */
   joinProject: async (projectId) => {
     const endpoint = buildEndpoint(PROJECT_ENDPOINTS.JOIN_PROJECT, { id: projectId })

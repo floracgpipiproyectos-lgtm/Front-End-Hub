@@ -7,9 +7,26 @@ import { NETWORK_ENDPOINTS, buildEndpoint } from '@/constants/apiEndpoints'
  */
 export const networkService = {
   /**
-   * Obtener lista de mentores
-   * @param {Object} filters - Filtros (skills, location, availability, etc.)
-   * @returns {Promise} Lista de mentores
+   * Obtiene una lista de mentores disponibles con filtros opcionales.
+   * Los mentores se ordenan por relevancia basada en skills y ubicación del usuario.
+   * 
+   * @param {Object} [filters={}] - Filtros para buscar mentores
+   * @param {Array<string>} [filters.skills] - Skills específicas del mentor
+   * @param {string} [filters.location] - Ubicación del mentor (ciudad, país)
+   * @param {boolean} [filters.available] - Solo mentores disponibles actualmente
+   * @param {number} [filters.limit=20] - Número máximo de resultados
+   * @returns {Promise<Array<{id: string, name: string, alias: string, 
+   *                          skills: Array, location: string, 
+   *                          availability: boolean, rating: number, 
+   *                          menteesCount: number}>>} 
+   *          Array de mentores que coinciden con los filtros
+   * 
+   * @example
+   * const mentors = await networkService.getMentors({
+   *   skills: ['React', 'TypeScript'],
+   *   location: 'Buenos Aires',
+   *   available: true
+   * })
    */
   getMentors: async (filters = {}) => {
     const response = await apiClient.get(NETWORK_ENDPOINTS.GET_MENTORS, {

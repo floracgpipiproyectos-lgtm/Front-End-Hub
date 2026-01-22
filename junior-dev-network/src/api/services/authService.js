@@ -7,9 +7,26 @@ import { AUTH_ENDPOINTS } from '@/constants/apiEndpoints'
  */
 export const authService = {
   /**
-   * Registro de nuevo usuario
-   * @param {Object} userData - Datos del usuario (email, password, alias, etc.)
-   * @returns {Promise} Respuesta con token y datos del usuario
+   * Registra un nuevo usuario en la plataforma.
+   * Crea una cuenta y retorna los tokens de autenticación.
+   * 
+   * @param {Object} userData - Datos del usuario para registro
+   * @param {string} userData.email - Email del usuario (requerido)
+   * @param {string} userData.password - Contraseña (mínimo 8 caracteres, requerido)
+   * @param {string} userData.alias - Nombre público/alias del usuario (requerido)
+   * @param {string} [userData.fullName] - Nombre completo (opcional)
+   * @returns {Promise<{token: string, refreshToken: string, user: Object}>} 
+   *          Objeto con tokens de autenticación y datos del usuario creado
+   * @throws {Error} Si el email ya existe, la contraseña es inválida o faltan campos requeridos
+   * 
+   * @example
+   * const result = await authService.register({
+   *   email: 'user@example.com',
+   *   password: 'securePassword123',
+   *   alias: 'johndoe',
+   *   fullName: 'John Doe'
+   * })
+   * console.log('Usuario registrado:', result.user)
    */
   register: async (userData) => {
     const response = await apiClient.post(AUTH_ENDPOINTS.REGISTER, userData)
@@ -17,9 +34,22 @@ export const authService = {
   },
 
   /**
-   * Inicio de sesión
-   * @param {Object} credentials - Credenciales (email, password)
-   * @returns {Promise} Respuesta con token y datos del usuario
+   * Inicia sesión con email y contraseña.
+   * Los tokens se guardan automáticamente en localStorage.
+   * 
+   * @param {Object} credentials - Credenciales de acceso
+   * @param {string} credentials.email - Email del usuario
+   * @param {string} credentials.password - Contraseña del usuario
+   * @returns {Promise<{token: string, refreshToken: string, user: Object}>} 
+   *          Objeto con tokens de autenticación y datos del usuario
+   * @throws {Error} Si las credenciales son incorrectas o el usuario no existe
+   * 
+   * @example
+   * const { token, user } = await authService.login({
+   *   email: 'user@example.com',
+   *   password: 'password123'
+   * })
+   * // Token guardado automáticamente en localStorage
    */
   login: async (credentials) => {
     const response = await apiClient.post(AUTH_ENDPOINTS.LOGIN, credentials)
@@ -33,8 +63,15 @@ export const authService = {
   },
 
   /**
-   * Cerrar sesión
-   * @returns {Promise} Respuesta del servidor
+   * Cierra la sesión del usuario actual.
+   * Invalida los tokens en el servidor y los elimina del localStorage.
+   * 
+   * @returns {Promise<{message: string}>} Confirmación de cierre de sesión
+   * @throws {Error} Si no hay sesión activa o el servidor rechaza la petición
+   * 
+   * @example
+   * await authService.logout()
+   * // Tokens eliminados automáticamente del localStorage
    */
   logout: async () => {
     const response = await apiClient.post(AUTH_ENDPOINTS.LOGOUT)
@@ -47,9 +84,18 @@ export const authService = {
   },
 
   /**
-   * Refrescar token de autenticación
-   * @param {string} refreshToken - Token de refresco
-   * @returns {Promise} Nuevo token de acceso
+   * Refresca el token de acceso usando el refresh token.
+   * Útil cuando el token de acceso ha expirado.
+   * El nuevo token se guarda automáticamente en localStorage.
+   * 
+   * @param {string} refreshToken - Token de refresco obtenido durante el login
+   * @returns {Promise<{token: string, expiresIn: number}>} 
+   *          Nuevo token de acceso y tiempo de expiración
+   * @throws {Error} Si el refresh token es inválido o ha expirado
+   * 
+   * @example
+   * const newToken = await authService.refreshToken(refreshToken)
+   * // Nuevo token guardado automáticamente
    */
   refreshToken: async (refreshToken) => {
     const response = await apiClient.post(AUTH_ENDPOINTS.REFRESH_TOKEN, {
@@ -125,8 +171,18 @@ export const authService = {
   },
 
   /**
-   * Obtener usuario actual autenticado
-   * @returns {Promise} Datos del usuario
+   * Obtiene los datos del usuario actualmente autenticado.
+   * Requiere token de autenticación válido.
+   * 
+   * @returns {Promise<{id: string, email: string, alias: string, 
+   *                    fullName?: string, avatar?: string, 
+   *                    skills: Array, createdAt: string}>} 
+   *          Datos completos del usuario autenticado
+   * @throws {Error} Si no hay token válido o el usuario no existe
+   * 
+   * @example
+   * const user = await authService.getCurrentUser()
+   * console.log('Usuario actual:', user.alias)
    */
   getCurrentUser: async () => {
     const response = await apiClient.get('/auth/me')

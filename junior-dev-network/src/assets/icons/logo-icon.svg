@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Fondo circular con gradiente -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Círculo de fondo -->
+  <circle cx="100" cy="100" r="90" fill="url(#gradient1)"/>
+  
+  <!-- Código/Desarrollo - símbolo de llaves -->
+  <path d="M 60 80 L 50 100 L 60 120 M 140 80 L 150 100 L 140 120" 
+        stroke="white" 
+        stroke-width="8" 
+        stroke-linecap="round" 
+        fill="none"/>
+  
+  <!-- Símbolo de red/conexión - puntos conectados -->
+  <circle cx="80" cy="100" r="6" fill="white"/>
+  <circle cx="100" cy="100" r="6" fill="white"/>
+  <circle cx="120" cy="100" r="6" fill="white"/>
+  <line x1="86" y1="100" x2="94" y2="100" stroke="white" stroke-width="3"/>
+  <line x1="106" y1="100" x2="114" y2="100" stroke="white" stroke-width="3"/>
+  
+  <!-- Estrella/Logro arriba -->
+  <path d="M 100 50 L 105 65 L 120 65 L 108 75 L 113 90 L 100 80 L 87 90 L 92 75 L 80 65 L 95 65 Z" 
+        fill="white" 
+        opacity="0.9"/>
+</svg>

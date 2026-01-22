@@ -7,8 +7,20 @@ import { PROFILE_ENDPOINTS, buildEndpoint } from '@/constants/apiEndpoints'
  */
 export const profileService = {
   /**
-   * Obtener perfil del usuario actual
-   * @returns {Promise} Datos del perfil
+   * Obtiene el perfil completo del usuario actualmente autenticado.
+   * Incluye información personal, skills, proyectos, badges y estadísticas.
+   * 
+   * @returns {Promise<{id: string, email: string, alias: string, 
+   *                   fullName?: string, avatar?: string, bio?: string,
+   *                   skills: Array, projects: Array, badges: Array,
+   *                   location?: string, website?: string, 
+   *                   socialLinks: Object, createdAt: string}>} 
+   *          Objeto con todos los datos del perfil del usuario
+   * @throws {Error} Si el usuario no está autenticado
+   * 
+   * @example
+   * const profile = await profileService.getProfile()
+   * console.log('Perfil:', profile.alias, '- Skills:', profile.skills.length)
    */
   getProfile: async () => {
     const response = await apiClient.get(PROFILE_ENDPOINTS.GET_PROFILE)
