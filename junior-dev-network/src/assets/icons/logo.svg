@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" fill="none">
+  <defs>
+    <!-- Gradiente principal -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Sombra suave -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.25"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Icono circular a la izquierda -->
+  <g transform="translate(10, 10)">
+    <!-- Círculo de fondo del icono -->
+    <circle cx="40" cy="40" r="38" fill="url(#mainGradient)" filter="url(#shadow)"/>
+    
+    <!-- Código - símbolo de llaves más estilizado -->
+    <path d="M 22 30 L 15 40 L 22 50 M 58 30 L 65 40 L 58 50" 
+          stroke="white" 
+          stroke-width="5" 
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="none"/>
+    
+    <!-- Símbolo de red/conexión - puntos conectados -->
+    <circle cx="32" cy="40" r="3.5" fill="white"/>
+    <circle cx="40" cy="40" r="3.5" fill="white"/>
+    <circle cx="48" cy="40" r="3.5" fill="white"/>
+    <line x1="35.5" y1="40" x2="36.5" y2="40" stroke="white" stroke-width="2.5"/>
+    <line x1="43.5" y1="40" x2="44.5" y2="40" stroke="white" stroke-width="2.5"/>
+    
+    <!-- Estrella/Logro arriba -->
+    <path d="M 40 18 L 42.5 28 L 52.5 28 L 44.5 34 L 47 44 L 40 38 L 33 44 L 35.5 34 L 27.5 28 L 37.5 28 Z" 
+          fill="white" 
+          opacity="0.95"/>
+  </g>
+  
+  <!-- Texto "JuniorDev" con diseño visual -->
+  <g transform="translate(100, 15)">
+    <!-- Fondo sutil -->
+    <rect x="0" y="0" width="190" height="70" rx="8" fill="url(#mainGradient)" opacity="0.08"/>
+    
+    <!-- Texto principal con gradiente -->
+    <text x="10" y="45" 
+          font-family="'Segoe UI', 'Arial', sans-serif" 
+          font-size="32" 
+          font-weight="700" 
+          fill="url(#mainGradient)"
+          letter-spacing="-0.5">
+      JuniorDev
+    </text>
+    
+    <!-- Texto "Network" más pequeño -->
+    <text x="10" y="65" 
+          font-family="'Segoe UI', 'Arial', sans-serif" 
+          font-size="16" 
+          font-weight="500" 
+          fill="#764ba2" 
+          opacity="0.75"
+          letter-spacing="1">
+      NETWORK
+    </text>
+    
+    <!-- Línea decorativa debajo -->
+    <line x1="10" y1="70" x2="180" y2="70" 
+          stroke="url(#mainGradient)" 
+          stroke-width="2.5" 
+          stroke-linecap="round"
+          opacity="0.6"/>
+  </g>
+  
+  <!-- Elementos decorativos sutiles de código a la derecha -->
+  <g opacity="0.12" transform="translate(280, 30)">
+    <!-- Llaves decorativas -->
+    <path d="M 0 10 L -3 20 L 0 30" 
+          stroke="#667eea" 
+          stroke-width="2.5" 
+          stroke-linecap="round"
+          fill="none"/>
+    <path d="M 8 10 L 11 20 L 8 30" 
+          stroke="#764ba2" 
+          stroke-width="2.5" 
+          stroke-linecap="round"
+          fill="none"/>
+    
+    <!-- Puntos de conexión -->
+    <circle cx="4" cy="20" r="1.5" fill="#667eea"/>
+  </g>
+</svg>

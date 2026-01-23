@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" fill="none">
+  <defs>
+    <linearGradient id="hero-banner-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f093fb;stop-opacity:0.8" />
+    </linearGradient>
+    <radialGradient id="hero-banner-circle" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </radialGradient>
+    <pattern id="hero-banner-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <rect width="100" height="100" fill="none"/>
+      <path d="M 20 20 L 20 40 M 40 20 L 40 40 M 60 20 L 60 40" 
+            stroke="white" 
+            stroke-width="2" 
+            opacity="0.05"/>
+    </pattern>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#hero-banner-gradient)"/>
+  <rect width="1920" height="1080" fill="url(#hero-banner-pattern)"/>
+  <circle cx="200" cy="200" r="300" fill="url(#hero-banner-circle)"/>
+  <circle cx="1720" cy="880" r="400" fill="url(#hero-banner-circle)"/>
+  <circle cx="960" cy="540" r="250" fill="url(#hero-banner-circle)"/>
+  <g opacity="0.15" transform="translate(300, 400)">
+    <path d="M 0 0 L -50 150 L 0 300 M 200 0 L 250 150 L 200 300" 
+          stroke="white" 
+          stroke-width="8" 
+          stroke-linecap="round"
+          fill="none"/>
+    <circle cx="75" cy="150" r="8" fill="white"/>
+    <circle cx="100" cy="150" r="8" fill="white"/>
+    <circle cx="125" cy="150" r="8" fill="white"/>
+  </g>
+  <g opacity="0.12" transform="translate(1400, 600)">
+    <path d="M 0 0 L -40 120 L 0 240 M 160 0 L 200 120 L 160 240" 
+          stroke="white" 
+          stroke-width="6" 
+          stroke-linecap="round"
+          fill="none"/>
+    <path d="M 80 60 L 85 80 L 105 80 L 90 92 L 95 112 L 80 100 L 65 112 L 70 92 L 55 80 L 75 80 Z" 
+          fill="white" 
+          opacity="0.8"/>
+  </g>
+  <g opacity="0.1">
+    <line x1="0" y1="540" x2="1920" y2="540" stroke="white" stroke-width="2"/>
+    <line x1="960" y1="0" x2="960" y2="1080" stroke="white" stroke-width="2"/>
+  </g>
+</svg>
