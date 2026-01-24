@@ -1,8 +1,9 @@
 // authService.js - VERSIÓN ACTUALIZADA
 import apiClient from '../apiClient'
 import { AUTH_ENDPOINTS, buildEndpoint } from '@/constants/apiEndpoints'
-import { STORAGE_KEYS, API_CONFIG } from '@/constants/apiConfig'  // NUEVO
-import { VALIDATION_RULES, VALIDATION_HELPERS } from '@/constants/validationRules'  // NUEVO
+import { STORAGE_KEYS, API_CONFIG } from '@/constants/apiConfig'
+import { VALIDATION_RULES, VALIDATION_HELPERS } from '@/constants/validationRules'
+import { CACHE_CONFIG } from '@/constants/cacheConfig'
 
 // =============================================
 // ESTRUCTURAS DE DATOS Y CONSTANTES

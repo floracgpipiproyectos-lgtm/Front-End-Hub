@@ -1,6 +1,6 @@
-// Ejemplo de uso - ejemplo.js
 /**
- * Ejemplo de uso del sistema de validaciones
+ * @fileoverview Sistema de validaciones unificado para JuniorDev Network
+ * @description Exporta todas las validaciones organizadas por módulo
  */
 
 import {
@@ -14,129 +14,139 @@ import {
 } from './validations/index.js'
 
 // =============================================
-// 1. VALIDACIÓN DE PORTFOLIO
+// EXPORTACIONES DE VALIDACIONES
 // =============================================
-console.log('🧪 1. Portfolio Validation Test:\n')
 
-const portfolioData = {
-    title: 'Mi Portafolio',
-    templateId: 'modern',
-    description: 'Un portafolio profesional',
-    primaryColor: '#FF5733',
-    portfolioUrl: 'https://mi-portfolio.dev'
-}
+// Exportar validaciones de autenticación
+export {
+  loginSchema,
+  registerSchema,
+  passwordResetSchema,
+  passwordChangeSchema,
+  validateLogin,
+  validateRegistration,
+  validatePasswordReset,
+  validatePasswordChange
+} from './authValidations.js'
 
-const portfolioResult = portfolioValidator.validate(portfolioData)
-console.log(portfolioResult.toString())
+// Exportar validaciones de formularios generales
+export {
+  contactSchema,
+  profileSchema,
+  projectSchema,
+  cvUploadSchema,
+  portfolioSchema,
+  validateContact,
+  validateProfile,
+  validateProject,
+  validateCVUpload,
+  validatePortfolio
+} from './formValidations.js'
 
-// Validar campo específico
-const titleResult = portfolioValidator.validateField('title', '')
-console.log('Title validation:', titleResult.toString())
-
+// Exportar validaciones de red/conexiones
+export {
+  connectionRequestSchema,
+  mentorSearchSchema,
+  communityPostSchema,
+  mentorshipSessionSchema,
+  feedbackSchema,
+  invitationSchema,
+  validateConnectionRequest,
+  validateMentorSearch,
+  validateCommunityPost,
+  validateMentorshipSession,
+  validateFeedback,
+  validateInvitation
+} from './networkValidations.js'
 // =============================================
-// 2. VALIDACIÓN DE AUTENTICACIÓN
+// EJEMPLO DE USO - Sistema de Validaciones
 // =============================================
-console.log('\n\n🧪 2. Auth Validation Test:\n')
+/**
+ * @fileoverview Sistema de validaciones unificado para JuniorDev Network
+ * Exporta todas las validaciones organizadas por módulo
+ */
 
-const authResult = authValidator.validateLoginCredentials(
-    'usuario@example.com',
-    'Password123'
-)
-console.log(authResult.toString())
+// Exportar validaciones de autenticación
+export {
+  loginSchema,
+  registerSchema,
+  passwordResetSchema,
+  passwordChangeSchema,
+  validateLogin,
+  validateRegistration,
+  validatePasswordReset,
+  validatePasswordChange
+} from './authValidations.js'
 
-// Validar fortaleza de contraseña
-const passwordResult = authValidator.validatePasswordStrength('weakpass')
-console.log('Password strength:', passwordResult.toString())
+// Exportar validaciones de formularios generales
+export {
+  contactSchema,
+  profileSchema,
+  projectSchema,
+  cvUploadSchema,
+  portfolioSchema,
+  validateContact,
+  validateProfile,
+  validateProject,
+  validateCVUpload,
+  validatePortfolio
+} from './formValidations.js'
 
-// =============================================
-// 3. VALIDACIÓN CON MANAGER GLOBAL
-// =============================================
-console.log('\n\n🧪 3. Global Manager Test:\n')
-
-const userData = {
-    email: 'test@example.com',
-    password: 'weak',
-    username: 'user_123'
-}
-
-const managerResult = validationManager.validateWith('auth', userData)
-console.log(managerResult.toString())
-
-// Estadísticas
-const stats = validationManager.getStats()
-console.log('Statistics:', stats)
-
-// =============================================
-// 4. VALIDACIÓN DE FORMULARIO GENÉRICO
-// =============================================
-console.log('\n\n🧪 4. Form Validation Test:\n')
-
-const formData = {
-    email: 'user@domain.com',
-    password: 'StrongPass123',
-    confirmPassword: 'StrongPass123',
-    agreeToTerms: true
-}
-
-const formRules = {
-    email: ValidationRules.EMAIL,
-    password: ValidationRules.PASSWORD_STRONG,
-    confirmPassword: [
-        { type: 'required', message: 'Please confirm your password' },
-        {
-            type: 'custom',
-            message: 'Passwords do not match',
-            customValidator: (value) => value === formData.password
-        }
-    ],
-    agreeToTerms: [
-        {
-            type: 'custom',
-            message: 'You must agree to the terms and conditions',
-            customValidator: (value) => value === true || value === 'true'
-        }
-    ]
-}
-
-const formResult = formValidator.validateForm(formData, formRules)
-console.log(formResult.toString())
-
-// =============================================
-// 5. USO DE VALIDATION HELPER
-// =============================================
-console.log('\n\n🧪 5. Helper Functions Test:\n')
-
-console.log('Is valid email "test@example.com":',
-    validationHelper.isValidEmail('test@example.com') ? '✅' : '❌')
-
-console.log('Is valid URL "https://google.com":',
-    validationHelper.isValidUrl('https://google.com') ? '✅' : '❌')
-
-console.log('Is strong password "Pass123!":',
-    validationHelper.isStrongPassword('Pass123!') ? '✅' : '❌')
+// Exportar validaciones de red/conexiones
+export {
+  connectionRequestSchema,
+  mentorSearchSchema,
+  communityPostSchema,
+  mentorshipSessionSchema,
+  feedbackSchema,
+  invitationSchema,
+  validateConnectionRequest,
+  validateMentorSearch,
+  validateCommunityPost,
+  validateMentorshipSession,
+  validateFeedback,
+  validateInvitation
+} from './networkValidations.js'
 
 // =============================================
-// 6. VALIDACIÓN CON FACTORY
+// EJEMPLO DE USO - Sistema de Validaciones
 // =============================================
-console.log('\n\n🧪 6. Factory Test:\n')
 
-const portfolioValidator2 = ValidatorFactory.createValidator('portfolio')
-const validationResult = portfolioValidator2.validate({
-    title: 'Test Portfolio',
-    templateId: 'invalid_template'
+/*
+import {
+  validateLogin,
+  validateContact,
+  validateConnectionRequest
+} from '@/validations'
+
+// 1. Validación de login
+const loginResult = validateLogin({
+  email: 'user@example.com',
+  password: 'SecurePass123!'
 })
+if (loginResult.success) {
+  console.log('✅ Login válido')
+} else {
+  console.log('❌ Errores:', loginResult.errors)
+}
 
-console.log('Factory-created validator result:', validationResult.toString())
+// 2. Validación de formulario de contacto
+const contactResult = validateContact({
+  name: 'Juan Pérez',
+  email: 'juan@example.com',
+  subject: 'Consulta sobre mentoría',
+  message: 'Me gustaría saber más sobre...'
+})
+if (contactResult.success) {
+  console.log('✅ Contacto válido')
+}
 
-// =============================================
-// 7. VALIDACIÓN DE ARCHIVOS
-// =============================================
-console.log('\n\n🧪 7. File Validation Test:\n')
-
-const fileResult = FileValidator.validateImage('avatar.jpg', 2 * 1024 * 1024) // 2MB
-console.log('Image validation:', fileResult)
-
-const pdfResult = FileValidator.validateDocument('cv.pdf', 8 * 1024 * 1024) // 8MB
-console.log('PDF validation:', pdfResult.success ? '✅ Valid' : '❌ Invalid')
-
-console.log('\n🎉 All validation tests completed!\n')
+// 3. Validación de solicitud de conexión
+const connectionResult = validateConnectionRequest({
+  recipientId: '550e8400-e29b-41d4-a716-446655440000',
+  message: 'Hola, me gustaría conectar contigo'
+})
+if (connectionResult.success) {
+  console.log('✅ Solicitud de conexión válida')
+}
+*/

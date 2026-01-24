@@ -1,5 +1,27 @@
 import { useState } from 'react'
-import './App.css'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import './App.scss'
+
+// Importar todas las validaciones
+import {
+  validateLogin,
+  validateContact,
+  validateProfile,
+  loginSchema,
+  contactSchema,
+  profileSchema
+} from './validations'
+
+// Importar todos los assets disponibles
+import logo from './assets/icons/logo.svg'
+import logoIcon from './assets/icons/logo-icon.svg'
+import heroBanner from './assets/images/hero/hero-banner.svg'
+import gradientBg from './assets/images/backgrounds/gradient-bg.svg'
+import defaultAvatar from './assets/images/avatars/default-avatar.svg'
+import emptyState from './assets/images/illustrations/empty-state.svg'
+import errorState from './assets/images/illustrations/error.svg'
+import successState from './assets/images/illustrations/success.svg'
 
 /**
  * Componente principal de la aplicación JuniorDev Network

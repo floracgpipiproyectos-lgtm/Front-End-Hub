@@ -2,8 +2,35 @@
 import axios from 'axios'
 import { API_CONFIG, STORAGE_KEYS } from '@/constants/apiConfig'
 import { FEATURE_FLAGS } from '@/constants/featureFlags'
+import { APP_CONSTANTS } from '@/constants/appConstants'
+import { CACHE_CONFIG } from '@/constants/cacheConfig'
 
+/**
+ * Cliente API avanzado para JuniorDev Network
+ * Proporciona funcionalidades como reintentos automáticos, manejo offline,
+ * cache inteligente, logging detallado y monitoreo de performance
+ *
+ * @class ApiClient
+ * @example
+ * ```javascript
+ * const apiClient = new ApiClient({
+ *   baseURL: 'https://api.juniordev.com',
+ *   timeout: 10000
+ * });
+ *
+ * const response = await apiClient.instance.get('/users');
+ * ```
+ */
 class ApiClient {
+  /**
+   * Crea una nueva instancia del cliente API
+   * @param {Object} [config={}] - Configuración opcional para el cliente
+   * @param {string} [config.baseURL] - URL base para las peticiones API
+   * @param {number} [config.timeout] - Timeout en milisegundos para las peticiones
+   * @param {Object} [config.headers] - Headers adicionales para las peticiones
+   * @param {number} [config.maxRetryAttempts] - Número máximo de reintentos
+   * @param {number} [config.retryDelay] - Delay base entre reintentos
+   */
   constructor(config = {}) {
     // Usar configuraciones centralizadas
     const defaultConfig = {
@@ -17,12 +44,17 @@ class ApiClient {
       retryDelay: config.retryDelay || API_CONFIG.RETRY_CONFIG.DEFAULT.BASE_DELAY
     }
 
+    /** @type {import('axios').AxiosInstance} Instancia de Axios configurada */
     this.instance = axios.create(defaultConfig)
-    this.setupInterceptors()
+
+    /** @type {Array} Cola de peticiones offline */
     this.requestQueue = []
+
+    /** @type {boolean} Estado de conectividad */
     this.isOnline = navigator.onLine
-    
-    // Monitorear conexión
+
+    // Configurar interceptores y monitoreo
+    this.setupInterceptors()
     this.setupConnectionMonitoring()
   }
 
@@ -103,7 +135,9 @@ class ApiClient {
   // =============================================
   
   /**
-   * Verifica conectividad con timeout configurable
+   * Verifica la conectividad con el servidor API mediante un health check
+   * @async
+   * @returns {Promise<boolean>} true si el servidor responde correctamente, false en caso contrario
    */
   async checkConnectivity() {
     try {
@@ -118,7 +152,13 @@ class ApiClient {
   }
   
   /**
-   * Realiza una petición con reintentos inteligentes
+   * Realiza una petición HTTP con estrategia de reintentos inteligente
+   * Implementa backoff exponencial con jitter para evitar sobrecarga del servidor
+   * @async
+   * @param {import('axios').AxiosRequestConfig} config - Configuración de la petición Axios
+   * @param {number} [retryAttempt=0] - Número del intento actual (interno)
+   * @returns {Promise<import('axios').AxiosResponse>} Respuesta de la petición exitosa
+   * @throws {Error} Error de la petición después de agotar todos los reintentos
    */
   async requestWithRetry(config, retryAttempt = 0) {
     const maxAttempts = config.maxRetryAttempts || API_CONFIG.RETRY_CONFIG.DEFAULT.MAX_ATTEMPTS
@@ -162,6 +202,12 @@ class ApiClient {
     })
   }
   
+  /**
+   * Maneja peticiones realizadas sin conexión a internet
+   * Si el modo offline está habilitado, guarda la petición en cola para procesarla posteriormente
+   * @param {import('axios').AxiosRequestConfig} config - Configuración de la petición fallida
+   * @returns {Promise<never>} Promesa rechazada con información sobre el estado offline
+   */
   handleOfflineRequest(config) {
     if (FEATURE_FLAGS.ENABLE_OFFLINE_MODE) {
       // Guardar en cola para cuando vuelva la conexión
@@ -170,25 +216,31 @@ class ApiClient {
         timestamp: Date.now(),
         id: `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       })
-      
+
       localStorage.setItem(STORAGE_KEYS.OFFLINE_QUEUE, JSON.stringify(this.requestQueue))
-      
+
       return Promise.reject({
         message: 'Request guardado para procesar cuando se recupere la conexión',
         isOffline: true,
         queuedAt: new Date().toISOString()
       })
     }
-    
+
     return Promise.reject({
       message: 'No hay conexión a internet',
       isOffline: true
     })
   }
   
+  /**
+   * Procesa la cola de peticiones almacenadas cuando no había conexión
+   * Intenta enviar todas las peticiones guardadas y limpia la cola al finalizar
+   * @async
+   * @returns {Promise<void>} No retorna valor, procesa las peticiones en background
+   */
   async processOfflineQueue() {
     const queue = JSON.parse(localStorage.getItem(STORAGE_KEYS.OFFLINE_QUEUE) || '[]')
-    
+
     for (const request of queue) {
       try {
         await this.instance(request.config)
@@ -197,7 +249,7 @@ class ApiClient {
         console.error(`❌ Error procesando request offline: ${error.message}`)
       }
     }
-    
+
     // Limpiar cola
     this.requestQueue = []
     localStorage.removeItem(STORAGE_KEYS.OFFLINE_QUEUE)
