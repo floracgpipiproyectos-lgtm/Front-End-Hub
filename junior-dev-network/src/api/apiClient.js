@@ -1,166 +1,205 @@
-// Ejemplo de uso (apiClientExample.js)
-import { ApiClient, ApiClientFactory } from './apiClient'
+// apiClient.js - VERSIÓN ACTUALIZADA
+import axios from 'axios'
+import { API_CONFIG, STORAGE_KEYS } from '@/constants/apiConfig'
+import { FEATURE_FLAGS } from '@/constants/featureFlags'
 
-// Función para mostrar notificaciones (podría integrarse con react-hot-toast)
-const showNotification = (message, type) => {
-  console.log(`[${type.toUpperCase()}] ${message}`)
-  
-  // En una app React, podrías usar:
-  // if (type === 'error') toast.error(message)
-  // else if (type === 'success') toast.success(message)
-  // else if (type === 'info') toast.info(message)
-  // else toast(message)
-}
+class ApiClient {
+  constructor(config = {}) {
+    // Usar configuraciones centralizadas
+    const defaultConfig = {
+      baseURL: config.baseURL || process.env.VITE_API_BASE_URL || API_CONFIG.BASE_URLS.DEVELOPMENT,
+      timeout: config.timeout || API_CONFIG.TIMEOUTS.DEFAULT,
+      headers: {
+        ...API_CONFIG.HEADERS.COMMON,
+        ...config.headers
+      },
+      maxRetryAttempts: config.maxRetryAttempts || API_CONFIG.RETRY_CONFIG.DEFAULT.MAX_ATTEMPTS,
+      retryDelay: config.retryDelay || API_CONFIG.RETRY_CONFIG.DEFAULT.BASE_DELAY
+    }
 
-async function main() {
-  console.log('=== Ejemplo de uso de ApiClient ===\n')
-
-  // Crear instancia del cliente
-  const apiClient = new ApiClient({
-    baseURL: 'http://api.junior-dev.com',
-    timeout: 30000,
-    maxRetryAttempts: 3
-  })
-
-  // Configurar callbacks
-  apiClient.setNotificationCallback(showNotification)
-
-  apiClient.setTokenExpiredCallback(() => {
-    console.log('🔐 Token expirado. Redirigiendo al login...')
-    // window.location.href = '/login'
-  })
-
-  apiClient.setTokenRefreshedCallback((newToken) => {
-    console.log('🔄 Token refrescado exitosamente')
-  })
-
-  // Establecer tokens (en una app real, estos vendrían del login)
-  apiClient.setAuthToken('tu_jwt_token_aqui')
-  apiClient.setRefreshToken('tu_refresh_token_aqui')
-
-  // Agregar interceptor personalizado para logging
-  apiClient.addRequestInterceptor((config) => {
-    console.log(`>>> ${config.method.toUpperCase()} ${config.url}`)
-    return config
-  })
-
-  apiClient.addResponseInterceptor((response) => {
-    console.log(`<<< ${response.status} ${response.statusText}`)
-    return response
-  })
-
-  // Ejemplo 1: Verificar conectividad
-  console.log('1. Verificando conectividad...')
-  const isConnected = await apiClient.checkConnectivity()
-  console.log(isConnected ? '✅ Conectado' : '❌ No conectado')
-
-  if (!isConnected) {
-    console.log('No se puede conectar al servidor. Saliendo...')
-    return
-  }
-
-  // Ejemplo 2: Obtener proyectos (GET)
-  console.log('\n2. Obteniendo proyectos...')
-  try {
-    const projects = await apiClient.getData('/projects', {
-      params: {
-        limit: 5,
-        skills: 'react,typescript'
-      }
-    })
-
-    console.log(`📊 Total proyectos: ${projects.total || projects.length}`)
+    this.instance = axios.create(defaultConfig)
+    this.setupInterceptors()
+    this.requestQueue = []
+    this.isOnline = navigator.onLine
     
-    if (Array.isArray(projects)) {
-      projects.slice(0, 3).forEach(project => {
-        console.log(`• ${project.title}`)
+    // Monitorear conexión
+    this.setupConnectionMonitoring()
+  }
+
+  // =============================================
+  // INTERCEPTORES MEJORADOS
+  // =============================================
+  
+  setupInterceptors() {
+    // Request interceptor con feature flags
+    this.instance.interceptors.request.use(
+      (config) => {
+        // Añadir timestamp para debugging
+        config.metadata = { startTime: Date.now() }
+        
+        // Añadir headers de autenticación si existen
+        const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`
+        }
+        
+        // Añadir header de versión de app
+        config.headers['X-App-Version'] = APP_CONSTANTS.APP_VERSION
+        
+        // Logging solo en desarrollo
+        if (FEATURE_FLAGS.DEV_MODE) {
+          console.log(`🌐 API Request: ${config.method.toUpperCase()} ${config.url}`, {
+            data: config.data,
+            params: config.params
+          })
+        }
+        
+        return config
+      },
+      (error) => {
+        console.error('❌ Request interceptor error:', error)
+        return Promise.reject(error)
+      }
+    )
+    
+    // Response interceptor con manejo mejorado
+    this.instance.interceptors.response.use(
+      (response) => {
+        const duration = Date.now() - response.config.metadata.startTime
+        
+        // Log de performance si es lento
+        if (duration > 1000 && FEATURE_FLAGS.ENABLE_PERFORMANCE_MONITORING) {
+          console.warn(`🐢 Response lento (${duration}ms): ${response.config.url}`)
+        }
+        
+        // Cachear respuesta si es apropiado
+        if (this.shouldCacheResponse(response)) {
+          this.cacheResponse(response)
+        }
+        
+        return response
+      },
+      async (error) => {
+        // Manejo centralizado de errores
+        const errorResponse = this.handleError(error)
+        
+        // Reintentos automáticos configurados
+        if (this.shouldRetry(error) && error.config) {
+          return this.retryRequest(error.config)
+        }
+        
+        // Manejo offline
+        if (!this.isOnline && error.message === 'Network Error') {
+          return this.handleOfflineRequest(error.config)
+        }
+        
+        return Promise.reject(errorResponse)
+      }
+    )
+  }
+  
+  // =============================================
+  // MÉTODOS MEJORADOS
+  // =============================================
+  
+  /**
+   * Verifica conectividad con timeout configurable
+   */
+  async checkConnectivity() {
+    try {
+      const response = await this.instance.get('/health', {
+        timeout: API_CONFIG.TIMEOUTS.HEALTH_CHECK
       })
-    } else if (projects.projects) {
-      projects.projects.slice(0, 3).forEach(project => {
-        console.log(`• ${project.title}`)
+      return response.status === 200
+    } catch (error) {
+      console.warn('⚠️ Health check failed:', error.message)
+      return false
+    }
+  }
+  
+  /**
+   * Realiza una petición con reintentos inteligentes
+   */
+  async requestWithRetry(config, retryAttempt = 0) {
+    const maxAttempts = config.maxRetryAttempts || API_CONFIG.RETRY_CONFIG.DEFAULT.MAX_ATTEMPTS
+    const baseDelay = config.retryDelay || API_CONFIG.RETRY_CONFIG.DEFAULT.BASE_DELAY
+    
+    try {
+      return await this.instance(config)
+    } catch (error) {
+      if (retryAttempt >= maxAttempts) {
+        throw error
+      }
+      
+      // Solo reintentar en ciertos errores
+      if (!API_CONFIG.RETRY_CONFIG.DEFAULT.RETRY_ON_STATUS.includes(error.response?.status)) {
+        throw error
+      }
+      
+      // Backoff exponencial con jitter
+      const delay = baseDelay * Math.pow(2, retryAttempt) + Math.random() * 1000
+      
+      console.log(`🔄 Reintentando en ${delay}ms (intento ${retryAttempt + 1}/${maxAttempts})`)
+      
+      await new Promise(resolve => setTimeout(resolve, delay))
+      
+      return this.requestWithRetry(config, retryAttempt + 1)
+    }
+  }
+  
+  // =============================================
+  // MANEJO OFFLINE
+  // =============================================
+  
+  setupConnectionMonitoring() {
+    window.addEventListener('online', () => {
+      this.isOnline = true
+      this.processOfflineQueue()
+    })
+    
+    window.addEventListener('offline', () => {
+      this.isOnline = false
+    })
+  }
+  
+  handleOfflineRequest(config) {
+    if (FEATURE_FLAGS.ENABLE_OFFLINE_MODE) {
+      // Guardar en cola para cuando vuelva la conexión
+      this.requestQueue.push({
+        config,
+        timestamp: Date.now(),
+        id: `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      })
+      
+      localStorage.setItem(STORAGE_KEYS.OFFLINE_QUEUE, JSON.stringify(this.requestQueue))
+      
+      return Promise.reject({
+        message: 'Request guardado para procesar cuando se recupere la conexión',
+        isOffline: true,
+        queuedAt: new Date().toISOString()
       })
     }
-  } catch (error) {
-    console.error('Error obteniendo proyectos:', error.message)
+    
+    return Promise.reject({
+      message: 'No hay conexión a internet',
+      isOffline: true
+    })
   }
-
-  // Ejemplo 3: Crear proyecto (POST)
-  console.log('\n3. Creando nuevo proyecto...')
-  try {
-    const newProject = {
-      title: 'Proyecto de ejemplo',
-      description: 'Este es un proyecto creado desde el ApiClient',
-      level: 'intermediate',
-      type: 'open-source'
+  
+  async processOfflineQueue() {
+    const queue = JSON.parse(localStorage.getItem(STORAGE_KEYS.OFFLINE_QUEUE) || '[]')
+    
+    for (const request of queue) {
+      try {
+        await this.instance(request.config)
+        console.log(`✅ Request offline procesado: ${request.config.url}`)
+      } catch (error) {
+        console.error(`❌ Error procesando request offline: ${error.message}`)
+      }
     }
-
-    const createdProject = await apiClient.postData('/projects', newProject)
-    console.log(`✅ Proyecto creado con ID: ${createdProject.id}`)
-  } catch (error) {
-    console.error('Error creando proyecto:', error.message)
+    
+    // Limpiar cola
+    this.requestQueue = []
+    localStorage.removeItem(STORAGE_KEYS.OFFLINE_QUEUE)
   }
-
-  // Ejemplo 4: Actualizar proyecto (PUT)
-  console.log('\n4. Actualizando proyecto...')
-  try {
-    const updates = {
-      description: 'Descripción actualizada desde ApiClient'
-    }
-
-    const updatedProject = await apiClient.putData('/projects/123', updates)
-    console.log('✅ Proyecto actualizado')
-  } catch (error) {
-    if (error.response?.status === 404) {
-      console.log('⚠️ Proyecto no encontrado (esto es esperado para el ejemplo)')
-    } else {
-      console.error('Error actualizando proyecto:', error.message)
-    }
-  }
-
-  // Ejemplo 5: Subir archivo
-  console.log('\n5. Subiendo archivo...')
-  try {
-    // Crear archivo de prueba en navegador (en Node.js sería diferente)
-    if (typeof File !== 'undefined') {
-      const blob = new Blob(['Contenido de prueba'], { type: 'text/plain' })
-      const file = new File([blob], 'test.txt', { type: 'text/plain' })
-      
-      const uploadResult = await apiClient.uploadFile(
-        '/projects/123/files',
-        file,
-        'document',
-        { description: 'Archivo de prueba' }
-      )
-      
-      console.log(`✅ Archivo subido: ${uploadResult.data.url}`)
-    } else {
-      console.log('⚠️ File API no disponible en este entorno')
-    }
-  } catch (error) {
-    console.error('Error subiendo archivo:', error.message)
-  }
-
-  // Ejemplo 6: Manejo de errores
-  console.log('\n6. Probando manejo de errores...')
-  try {
-    // Intentar acceder a endpoint que no existe
-    await apiClient.getData('/endpoint-que-no-existe')
-  } catch (error) {
-    console.log(`Manejado error ${error.response?.status || 'network'}: ${error.message}`)
-  }
-
-  // Ejemplo 7: Información del cliente
-  console.log('\n7. Información del cliente:')
-  const clientInfo = apiClient.getClientInfo()
-  Object.entries(clientInfo).forEach(([key, value]) => {
-    console.log(`  ${key}: ${value}`)
-  })
-
-  // Ejemplo 8: Usando factory
-  console.log('\n8. Usando ApiClientFactory...')
-  const testClient = ApiClientFactory.createForTesting()
-  console.log(`Cliente de testing creado: ${testClient.config.baseURL}`)
 }
-
-// Ejecutar ejemplo
-main().catch(console.error)

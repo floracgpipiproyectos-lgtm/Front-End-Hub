@@ -1,0 +1,51 @@
+// store/selectors/authSelectors.js
+import { createSelector } from '@reduxjs/toolkit'
+import { APP_CONSTANTS } from '@/constants/appConstants'
+
+// Selectores básicos
+export const selectAuth = (state) => state.auth
+export const selectUser = (state) => state.auth.user
+export const selectIsAuthenticated = (state) => state.auth.isAuthenticated
+export const selectAuthStatus = (state) => state.auth.status
+export const selectAuthError = (state) => state.auth.error
+
+// Selectores memoizados (derivados)
+export const selectUserDisplayName = createSelector(
+    [selectUser],
+    (user) => {
+        if (!user) return 'Usuario'
+        return user.fullName || user.alias || user.email.split('@')[0]
+    }
+)
+
+export const selectUserAvatar = createSelector(
+    [selectUser],
+    (user) => {
+        if (!user) return APP_CONSTANTS.DEFAULT_AVATAR
+        return user.avatarUrl || APP_CONSTANTS.DEFAULT_AVATAR
+    }
+)
+
+export const selectUserInitials = createSelector(
+    [selectUser],
+    (user) => {
+        if (!user) return 'JD'
+        const name = user.fullName || user.alias || user.email
+        return name
+            .split(' ')
+            .map(part => part[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2)
+    }
+)
+
+export const selectSessionDuration = createSelector(
+    [selectAuth],
+    (auth) => {
+        if (!auth.meta.sessionStart) return 0
+        const start = new Date(auth.meta.sessionStart)
+        const now = new Date()
+        return Math.floor((now - start) / (1000 * 60)) // minutos
+    }
+)
