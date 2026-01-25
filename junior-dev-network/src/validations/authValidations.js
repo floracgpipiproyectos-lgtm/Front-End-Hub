@@ -22,6 +22,28 @@ export const loginSchema = z.object({
 })
 
 /**
+ * Validates login credentials using Zod schema
+ * @param {Object} data - Login data to validate
+ * @param {string} data.email - User's email
+ * @param {string} data.password - User's password
+ * @returns {Object} Validation result with success/error details
+ */
+export const validateLogin = (data) => {
+  try {
+    const result = loginSchema.parse(data)
+    return { success: true, data: result }
+  } catch (error) {
+    return {
+      success: false,
+      errors: error.errors.map(err => ({
+        field: err.path.join('.'),
+        message: err.message
+      }))
+    }
+  }
+}
+
+/**
  * Zod schema for user registration validation
  * @typedef {Object} RegisterSchema
  * @property {string} username - User's username
@@ -101,28 +123,6 @@ export const passwordChangeSchema = z.object({
   message: 'La nueva contraseña debe ser diferente a la actual',
   path: ['newPassword']
 })
-
-/**
- * Validates login credentials using Zod schema
- * @param {Object} data - Login data to validate
- * @param {string} data.email - User's email
- * @param {string} data.password - User's password
- * @returns {Object} Validation result with success/error details
- */
-export const validateLogin = (data) => {
-  try {
-    const result = loginSchema.parse(data)
-    return { success: true, data: result }
-  } catch (error) {
-    return {
-      success: false,
-      errors: error.errors.map(err => ({
-        field: err.path.join('.'),
-        message: err.message
-      }))
-    }
-  }
-}
 
 /**
  * Validates registration data using Zod schema

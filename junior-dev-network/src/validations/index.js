@@ -3,15 +3,7 @@
  * @description Exporta todas las validaciones organizadas por módulo
  */
 
-import {
-    portfolioValidator,
-    authValidator,
-    formValidator,
-    validationHelper,
-    validationManager,
-    ValidationRules,
-    ValidatorFactory
-} from './validations/index.js'
+
 
 // =============================================
 // EXPORTACIONES DE VALIDACIONES
@@ -43,74 +35,8 @@ export {
   validatePortfolio
 } from './formValidations.js'
 
-// Exportar validaciones de red/conexiones
-export {
-  connectionRequestSchema,
-  mentorSearchSchema,
-  communityPostSchema,
-  mentorshipSessionSchema,
-  feedbackSchema,
-  invitationSchema,
-  validateConnectionRequest,
-  validateMentorSearch,
-  validateCommunityPost,
-  validateMentorshipSession,
-  validateFeedback,
-  validateInvitation
-} from './networkValidations.js'
-// =============================================
-// EJEMPLO DE USO - Sistema de Validaciones
-// =============================================
-/**
- * @fileoverview Sistema de validaciones unificado para JuniorDev Network
- * Exporta todas las validaciones organizadas por módulo
- */
 
-// Exportar validaciones de autenticación
-export {
-  loginSchema,
-  registerSchema,
-  passwordResetSchema,
-  passwordChangeSchema,
-  validateLogin,
-  validateRegistration,
-  validatePasswordReset,
-  validatePasswordChange
-} from './authValidations.js'
 
-// Exportar validaciones de formularios generales
-export {
-  contactSchema,
-  profileSchema,
-  projectSchema,
-  cvUploadSchema,
-  portfolioSchema,
-  validateContact,
-  validateProfile,
-  validateProject,
-  validateCVUpload,
-  validatePortfolio
-} from './formValidations.js'
-
-// Exportar validaciones de red/conexiones
-export {
-  connectionRequestSchema,
-  mentorSearchSchema,
-  communityPostSchema,
-  mentorshipSessionSchema,
-  feedbackSchema,
-  invitationSchema,
-  validateConnectionRequest,
-  validateMentorSearch,
-  validateCommunityPost,
-  validateMentorshipSession,
-  validateFeedback,
-  validateInvitation
-} from './networkValidations.js'
-
-// =============================================
-// EJEMPLO DE USO - Sistema de Validaciones
-// =============================================
 
 /*
 import {
