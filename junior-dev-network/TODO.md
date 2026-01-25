@@ -37,5 +37,5 @@
 ## 7. Followup Steps
 - [ ] Test the application functionality
 - [ ] Verify validations work correctly
-- [ ] Check that assets load properly
-- [ ] Confirm SCSS compilation works
+- [X] Check that assets load properly
+- [X] Confirm SCSS compilation works
