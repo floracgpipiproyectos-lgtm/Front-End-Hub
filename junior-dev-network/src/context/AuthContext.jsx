@@ -1,86 +1,132 @@
 import { createContext, useState, useEffect, useContext } from 'react'
+import { authService } from '@/api/services/authService'
 
 const AuthContext = createContext()
 
 /**
  * Proveedor de contexto de autenticación
  * Gestiona el estado global del usuario y las funciones de login/logout
+ * CONECTADO AL BACKEND REAL via authService
  */
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const token = localStorage.getItem('token')
-    const userStr = localStorage.getItem('user')
-    
-    if (token && userStr) {
-      try {
-        return JSON.parse(userStr)
-      } catch {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-      }
-    }
-    return null
-  })
-  const [loading] = useState(false)
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   // Verificar si hay sesión activa al cargar
   useEffect(() => {
-    // Effect body is now empty - initialization happens in useState
+    const initAuth = async () => {
+      try {
+        // Intentar obtener usuario desde cache
+        const cachedUser = authService.getCachedUser()
+        
+        if (cachedUser && authService.isAuthenticated()) {
+          setUser(cachedUser)
+        } else {
+          // Limpiar si no hay sesión válida
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+        }
+      } catch (err) {
+        console.error('Error inicializando auth:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    initAuth()
   }, [])
 
-  const login = async (email) => {
+  /**
+   * Inicia sesión usando el servicio de autenticación real
+   * @param {string} email - Email del usuario
+   * @param {string} password - Contraseña del usuario
+   */
+  const login = async (email, password) => {
     setError(null)
-    // Mock login - reemplazar con llamada real a API
-    const user = {
-      id: '1',
-      email,
-      alias: email.split('@')[0],
-      skills: [],
-      badges: [],
-      cv_url: null,
-      createdAt: new Date().toISOString()
-    }
-    const token = 'mock-token-' + Date.now()
+    setLoading(true)
     
-    localStorage.setItem('token', token)
-    localStorage.setItem('user', JSON.stringify(user))
-    setUser(user)
-    return { token, user }
+    try {
+      const { user: userData, token, refreshToken } = await authService.login({ 
+        email, 
+        password 
+      })
+      
+      setUser(userData)
+      return { token, user: userData, refreshToken }
+    } catch (err) {
+      const errorMessage = err.message || 'Error al iniciar sesión'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const register = async (alias, email) => {
+  /**
+   * Registra un nuevo usuario usando el servicio real
+   * @param {string} alias - Nombre de usuario
+   * @param {string} email - Email del usuario
+   * @param {string} password - Contraseña del usuario
+   */
+  const register = async (alias, email, password) => {
     setError(null)
-    const user = {
-      id: '1',
-      email,
-      alias,
-      skills: [],
-      badges: [],
-      cv_url: null,
-      createdAt: new Date().toISOString()
-    }
-    const token = 'mock-token-' + Date.now()
+    setLoading(true)
     
-    localStorage.setItem('token', token)
-    localStorage.setItem('user', JSON.stringify(user))
-    setUser(user)
-    return { token, user }
+    try {
+      const { user: userData, token, refreshToken } = await authService.registerUser({ 
+        alias, 
+        email, 
+        password 
+      })
+      
+      setUser(userData)
+      return { token, user: userData, refreshToken }
+    } catch (err) {
+      const errorMessage = err.message || 'Error al registrarse'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    setUser(null)
+  /**
+   * Cierra sesión y limpia el estado
+   */
+  const logout = async () => {
+    try {
+      await authService.logout()
+    } catch (err) {
+      // Limpiar localmente aunque falle el logout remoto
+      console.warn('Logout remoto falló, limpiando localmente:', err)
+    } finally {
+      setUser(null)
+      setError(null)
+    }
   }
 
+  /**
+   * Actualiza los datos del usuario en el estado
+   * @param {Object} updatedUser - Datos actualizados del usuario
+   */
   const updateUser = (updatedUser) => {
     setUser(updatedUser)
+    // Actualizar también en localStorage
     localStorage.setItem('user', JSON.stringify(updatedUser))
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      error, 
+      login, 
+      register, 
+      logout, 
+      updateUser,
+      isAuthenticated: !!user 
+    }}>
       {children}
     </AuthContext.Provider>
   )

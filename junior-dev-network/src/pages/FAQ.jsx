@@ -1,6 +1,8 @@
 /**
  * Página de FAQ (Preguntas Frecuentes)
  */
+import { Link } from 'react-router-dom'
+
 export default function FAQ() {
   const faqs = [
     {
@@ -33,7 +35,7 @@ export default function FAQ() {
     },
     {
       question: "¿Cómo puedo empezar?",
-      answer: "¡Es很简单! Solo necesitas crear una cuenta gratuita, subir tu CV y comenzar a explorar proyectos y conectarte con otros desarrolladores."
+      answer: "¡Es muy fácil! Solo necesitas crear una cuenta gratuita, subir tu CV y comenzar a explorar proyectos y conectarte con otros desarrolladores."
     }
   ]
 
@@ -62,9 +64,9 @@ export default function FAQ() {
           {/* Contact CTA */}
           <div className="mt-12 text-center">
             <p className="text-gray-600 mb-4">¿No encontraste la respuesta que buscabas?</p>
-            <a href="/contacto" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+            <Link to="/contacto" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
               Contáctanos
-            </a>
+            </Link>
           </div>
         </div>
       </section>

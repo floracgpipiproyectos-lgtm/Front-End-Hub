@@ -1,41 +1,38 @@
-# TODO: Enhance JuniorDev Network Project
+# TODO - Mejoras del Proyecto Junior Dev Network
 
-## 1. Add Validations to Validations Folder
-- [x] Create `authValidations.js` with Zod schemas for authentication
-- [x] Create `formValidations.js` with general form validation schemas
-- [x] Create `networkValidations.js` for network-related validations
-- [x] Update `validations/index.js` to export all validation modules
+## ✅ COMPLETADOS
 
-## 2. Add Validations to Pages
-- [x] Modify `pages/network/index.js` to include form validations
-- [x] Integrate React Hook Form with Zod schemas in network page
-- [x] Add validation error display and handling
+### 1. Conectar AuthContext al authService real ✅
+- [x] Actualizar AuthContext.jsx para usar authService en lugar de mock data
+- [x] Integrar manejo de tokens reales
+- [x] Agregar logout real
 
-## 3. Ensure JSDoc Documentation
-- [x] Add JSDoc to apiClient.js (completed)
-- [ ] Add JSDoc to remaining files in `src/` directory
-- [ ] Verify and complete JSDoc in existing files
-- [ ] Ensure all functions, components, parameters, and return types are documented
+### 2. Eliminar duplicación AuthContext vs Redux ✅
+- [x] Revisar authSlice de Redux
+- [x] Decidir si usar solo AuthContext o solo Redux para auth - DECISIÓN: Usar AuthContext (más simple)
+- [x] Sincronizar estado entre ambos si es necesario
 
-## 4. Modify Page for Functionality Testing
-- [x] Update `App.jsx` to include testing section with forms
-- [x] Add interactive validation demos
-- [x] Integrate asset usage in testing components
+### 3. Implementar code splitting ✅
+- [x] Agregar React.lazy y Suspense para páginas
 
-## 5. Convert CSS to SCSS with SASS
-- [x] Install SASS as dev dependency
-- [x] Convert `App.css` to `App.scss` with variables, mixins, and nesting
-- [x] Convert `index.css` to `index.scss` with improved structure
-- [x] Update imports in `App.jsx` and `main.jsx`
-- [x] Create beautiful and functional SCSS with comprehensive styling
+### 4. Correcciones de navegación ✅
+- [x] FAQ.jsx - Corregido import Link, typo, anchor→Link
+- [x] Navbar - Actualizado con todos los enlaces
+- [x] Hero - Actualizado con enlaces adicionales
+- [x] Footer - Actualizado con React Router Links
 
-## 6. Use All Assets Properly
-- [x] Import and display all available assets in components
-- [x] Update `App.jsx` to showcase all assets
-- [x] Ensure assets are used in testing sections
+## PENDIENTES
 
-## 7. Followup Steps
-- [ ] Test the application functionality
-- [ ] Verify validations work correctly
-- [X] Check that assets load properly
-- [X] Confirm SCSS compilation works
+### 5. Agregar validaciones de formulario
+- [ ] Usar las validaciones existentes en el LoginPage
+- [ ] Mejorar mensajes de error
+
+### 6. Optimizar rendimiento
+- [ ] Agregar React.memo a componentes que se repiten
+- [ ] Implementar virtualización si hay listas grandes
+
+## Notas
+- El authService ya está bien implementado con API real
+- AuthContext ahora usa el servicio real de autenticación
+- Code splitting implementado para mejor rendimiento
+- Se decidió usar solo AuthContext (no Redux) para autenticación

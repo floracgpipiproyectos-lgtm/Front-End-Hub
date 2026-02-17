@@ -1,8 +1,8 @@
 /**
  * Componente Hero de la landing page
+ * ACTUALIZADO: Incluye más enlaces a otras páginas
  */
 import { Link } from 'react-router-dom'
-import Button from '../common/Button'
 
 export default function Hero() {
   return (
@@ -15,12 +15,28 @@ export default function Hero() {
           Sube tu CV, descubre proyectos accesibles, conecta con mentores y construye tu portafolio desde cero.
           Todo lo que necesitas para conseguir tu primer trabajo como desarrollador.
         </p>
-        <div className="space-x-4">
-          <Link to="/register" className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+        <div className="space-x-4 mb-8">
+          <Link to="/register" className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition inline-block">
             Comienza gratis →
           </Link>
-          <Link to="/login" className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">
+          <Link to="/login" className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition inline-block">
             Tengo cuenta
+          </Link>
+        </div>
+        
+        {/* Links adicionales */}
+        <div className="flex flex-wrap justify-center gap-4 text-sm">
+          <Link to="/mentores" className="text-blue-200 hover:text-white underline">
+            🧑‍🏫 Encuentra un Mentor
+          </Link>
+          <Link to="/caracteristicas" className="text-blue-200 hover:text-white underline">
+            ✨ Ver Características
+          </Link>
+          <Link to="/precios" className="text-blue-200 hover:text-white underline">
+            💰 Planes y Precios
+          </Link>
+          <Link to="/faq" className="text-blue-200 hover:text-white underline">
+            ❓ Preguntas Frecuentes
           </Link>
         </div>
       </div>
