@@ -1,7 +1,22 @@
-// components/network/ChatWindow.jsx
+/**
+ * @fileoverview Componente ChatWindow para comunicación en tiempo real entre usuarios
+ * Gestiona visualización de mensajes, envío de mensajes y suscripción a actualizaciones WebSocket
+ */
+
 import React, { useState, useEffect, useRef } from 'react'
 import { useNetwork } from '@/store/hooks/useNetwork'
 
+/**
+ * Componente que renderiza una ventana de chat interactiva con soporte para WebSocket
+ * @component
+ * @param {Object} props - Las propiedades del componente
+ * @param {string} props.conversationId - ID de la conversación actual
+ * @param {string} props.userId - ID del usuario actual para identificar mensajes propios
+ * @returns {React.ReactElement} Ventana de chat con historial de mensajes y formulario de envío
+ * 
+ * @example
+ * <ChatWindow conversationId="conv-123" userId="user-456" />
+ */
 const ChatWindow = ({ conversationId, userId }) => {
     const {
         getMessagesByConversation,
@@ -15,12 +30,20 @@ const ChatWindow = ({ conversationId, userId }) => {
     const [isSending, setIsSending] = useState(false)
     const messagesEndRef = useRef(null)
 
+    // Obtener mensajes de la conversación actual
     const messages = getMessagesByConversation(conversationId)
 
+    /**
+     * Carga los mensajes existentes al montar o cambiar de conversación
+     */
     useEffect(() => {
         loadMessages({ conversationId })
     }, [conversationId, loadMessages])
 
+    /**
+     * Establece conexión WebSocket para mensajes en tiempo real
+     * Escucha nuevos mensajes y marca como leídos automáticamente
+     */
     useEffect(() => {
         // Simular WebSocket para mensajes en tiempo real
         const ws = new WebSocket(`ws://tu-api/chat/${conversationId}`)
@@ -38,6 +61,12 @@ const ChatWindow = ({ conversationId, userId }) => {
         return () => ws.close()
     }, [conversationId, userId, addMessage, markMessageAsRead])
 
+    /**
+     * Maneja el envío de mensajes al servidor
+     * @async
+     * @param {React.FormEvent} e - Evento del formulario
+     * @throws {Error} Si falla el envío del mensaje
+     */
     const handleSendMessage = async (e) => {
         e.preventDefault()
         if (!newMessage.trim() || isSending) return
@@ -55,6 +84,9 @@ const ChatWindow = ({ conversationId, userId }) => {
         }
     }
 
+    /**
+     * Desplaza automáticamente al último mensaje
+     */
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
@@ -72,6 +104,7 @@ const ChatWindow = ({ conversationId, userId }) => {
                         className={`message ${message.senderId === userId ? 'sent' : 'received'}`}
                     >
                         <p>{message.content}</p>
+                        {/* Mostrar timestamp del mensaje */}
                         <span className="timestamp">
                             {new Date(message.sentAt).toLocaleTimeString()}
                         </span>
@@ -80,6 +113,7 @@ const ChatWindow = ({ conversationId, userId }) => {
                 <div ref={messagesEndRef} />
             </div>
 
+            {/* Formulario de envío de mensajes */}
             <form onSubmit={handleSendMessage} className="message-form">
                 <input
                     type="text"

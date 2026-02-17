@@ -11,15 +11,18 @@ import { CACHE_CONFIG } from '@/constants/cacheConfig'
  * cache inteligente, logging detallado y monitoreo de performance
  *
  * @class ApiClient
- * @example
- * ```javascript
- * const apiClient = new ApiClient({
+ * 
+```
+javascript
+ * const api
+ * @exampleClient = new ApiClient({
  *   baseURL: 'https://api.juniordev.com',
  *   timeout: 10000
  * });
  *
  * const response = await apiClient.instance.get('/users');
- * ```
+ * 
+```
  */
 class ApiClient {
   /**
@@ -34,7 +37,7 @@ class ApiClient {
   constructor(config = {}) {
     // Usar configuraciones centralizadas
     const defaultConfig = {
-      baseURL: config.baseURL || process.env.VITE_API_BASE_URL || API_CONFIG.BASE_URLS.DEVELOPMENT,
+      baseURL: config.baseURL || import.meta.env.VITE_API_BASE_URL || API_CONFIG.BASE_URLS.DEVELOPMENT,
       timeout: config.timeout || API_CONFIG.TIMEOUTS.DEFAULT,
       headers: {
         ...API_CONFIG.HEADERS.COMMON,
@@ -255,3 +258,6 @@ class ApiClient {
     localStorage.removeItem(STORAGE_KEYS.OFFLINE_QUEUE)
   }
 }
+
+// Exportar instancia por defecto
+export default new ApiClient()

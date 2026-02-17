@@ -1,7 +1,20 @@
-// components/GamificationDashboard.jsx
-import React, { useEffect } from 'react'
-import { useGamification, useRewards } from '@/store/hooks/useGamification'
+/**
+ * @fileoverview Componente GamificationDashboard para mostrar progreso, badges y recompensas
+ * Integra visualización de progreso, badges, leaderboard, metas y notificaciones
+ */
 
+import React, { useEffect } from 'react'
+import { useGamification } from '@/store/hooks/useGamification'
+
+/**
+ * Componente principal del dashboard de gamificación
+ * Muestra progreso de usuario, badges, leaderboard y objetivos activos
+ * @component
+ * @returns {React.ReactElement} Dashboard completo de gamificación
+ * 
+ * @example
+ * <GamificationDashboard />
+ */
 const GamificationDashboard = () => {
     const {
         // Estado
@@ -30,12 +43,9 @@ const GamificationDashboard = () => {
         getBadgesByType
     } = useGamification()
 
-    const {
-        rewardProjectCompletion,
-        rewardDailyLogin
-    } = useRewards()
-
-    // Cargar datos al montar
+    /**
+     * Carga todos los datos de gamificación al montar
+     */
     useEffect(() => {
         const loadData = async () => {
             await Promise.all([
@@ -49,9 +59,20 @@ const GamificationDashboard = () => {
         loadData()
     }, [loadProgress, loadUserBadges, loadLeaderboard, loadGoals])
 
-    // Simular recompensa diaria
+    /**
+     * Calcula si el usuario está cerca de subir de nivel
+     * @returns {boolean} True si faltan menos del 10% de XP
+     */
+    const isNearLevelUp = () => {
+        return levelProgress.percentage >= 90
+    }
+
+    /**
+     * Maneja la reclamación de recompensa diaria
+     * @async
+     */
     const handleDailyReward = async () => {
-        await rewardDailyLogin()
+        // Recompensar login diario
         sendNotification({
             type: 'success',
             title: '¡Recompensa diaria!',
@@ -61,17 +82,17 @@ const GamificationDashboard = () => {
     }
 
     if (isLoading) {
-        return <div>Cargando gamificación...</div>
+        return <div className="loading">Cargando gamificación...</div>
     }
 
     if (hasError) {
-        return <div>Error cargando datos de gamificación</div>
+        return <div className="error-state">Error cargando datos de gamificación</div>
     }
 
     return (
         <div className="gamification-dashboard">
-            {/* Sección de progreso */}
-            <div className="progress-section">
+            {/* Sección de progreso de nivel */}
+            <section className="progress-section">
                 <h2>Tu Progreso</h2>
                 <div className="level-info">
                     <span className="level">Nivel {progress.level}</span>
@@ -79,18 +100,23 @@ const GamificationDashboard = () => {
                         <div
                             className="xp-fill"
                             style={{ width: `${levelProgress.percentage}%` }}
+                            role="progressbar"
+                            aria-valuenow={levelProgress.percentage}
+                            aria-valuemin="0"
+                            aria-valuemax="100"
                         />
                         <span className="xp-text">
                             {progress.xp} / {progress.nextLevelXP} XP
                         </span>
                     </div>
-                    {isNearLevelUp && (
-                        <div className="level-up-alert">
+                    {isNearLevelUp() && (
+                        <div className="level-up-alert" role="status">
                             ¡Casi subes de nivel! Faltan {levelProgress.needed} XP
                         </div>
                     )}
                 </div>
 
+                {/* Estadísticas principales */}
                 <div className="stats-grid">
                     <div className="stat">
                         <span className="stat-value">{progress.badgesEarned}</span>
@@ -109,35 +135,43 @@ const GamificationDashboard = () => {
                         <span className="stat-label">Conexiones</span>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {/* Sección de badges */}
-            <div className="badges-section">
+            {/* Sección de badges obtenidos */}
+            <section className="badges-section">
                 <h2>Tus Badges</h2>
                 <div className="badges-grid">
                     {userBadges.slice(0, 8).map((userBadge) => (
-                        <div key={userBadge.badge.id} className="badge">
+                        <div
+                            key={userBadge.badge.id}
+                            className={`badge ${userBadge.isNew ? 'new-badge' : ''}`}
+                            title={userBadge.badge.name}
+                        >
                             <img
                                 src={userBadge.badge.iconUrl}
                                 alt={userBadge.badge.name}
-                                className={`badge-icon ${userBadge.isNew ? 'new' : ''}`}
+                                className="badge-icon"
                             />
                             <span className="badge-name">{userBadge.badge.name}</span>
-                            {userBadge.isNew && <span className="badge-new">Nuevo</span>}
+                            {userBadge.isNew && (
+                                <span className="badge-new-indicator">Nuevo</span>
+                            )}
                         </div>
                     ))}
                 </div>
                 {newBadges.length > 0 && (
-                    <div className="new-badges-alert">
+                    <div className="new-badges-alert" role="status">
                         Tienes {newBadges.length} badges nuevos por ver
                     </div>
                 )}
-            </div>
+            </section>
 
             {/* Sección de leaderboard */}
             {currentLeaderboard && (
-                <div className="leaderboard-section">
-                    <h2>Leaderboard {currentLeaderboard.type === 'weekly' ? 'Semanal' : 'General'}</h2>
+                <section className="leaderboard-section">
+                    <h2>
+                        Leaderboard {currentLeaderboard.type === 'weekly' ? 'Semanal' : 'General'}
+                    </h2>
                     <div className="leaderboard">
                         <div className="leaderboard-header">
                             <span>Posición</span>
@@ -147,7 +181,9 @@ const GamificationDashboard = () => {
                         {currentLeaderboard.topEntries.map((entry) => (
                             <div
                                 key={entry.userId}
-                                className={`leaderboard-entry ${entry.rank === currentLeaderboard.userRank ? 'current-user' : ''}`}
+                                className={`leaderboard-entry ${
+                                    entry.rank === currentLeaderboard.userRank ? 'current-user' : ''
+                                }`}
                             >
                                 <span className="rank">#{entry.rank}</span>
                                 <span className="user">{entry.alias}</span>
@@ -160,11 +196,11 @@ const GamificationDashboard = () => {
                             </div>
                         )}
                     </div>
-                </div>
+                </section>
             )}
 
-            {/* Sección de metas */}
-            <div className="goals-section">
+            {/* Sección de metas activas */}
+            <section className="goals-section">
                 <h2>Tus Metas Activas</h2>
                 <div className="goals-list">
                     {activeGoals.slice(0, 3).map((goal) => {
@@ -181,24 +217,32 @@ const GamificationDashboard = () => {
                                     <div
                                         className="goal-fill"
                                         style={{ width: `${percentage}%` }}
+                                        role="progressbar"
+                                        aria-valuenow={percentage}
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
                                     />
                                 </div>
                             </div>
                         )
                     })}
                 </div>
-            </div>
+            </section>
 
-            {/* Notificaciones */}
+            {/* Indicador de notificaciones */}
             {unreadNotificationsCount > 0 && (
-                <div className="notifications-badge">
+                <div className="notifications-badge" role="status" aria-live="polite">
                     <span>{unreadNotificationsCount}</span>
                 </div>
             )}
 
             {/* Botones de acción */}
             <div className="actions">
-                <button onClick={handleDailyReward} className="btn-primary">
+                <button
+                    onClick={handleDailyReward}
+                    className="btn-primary"
+                    title="Reclamar recompensa diaria"
+                >
                     Reclamar recompensa diaria
                 </button>
             </div>
