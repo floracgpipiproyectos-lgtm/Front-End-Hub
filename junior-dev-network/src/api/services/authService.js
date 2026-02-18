@@ -1,9 +1,10 @@
-// authService.js - VERSIÓN ACTUALIZADA
+// authService.js - VERSIÓN ACTUALIZADA CON SEGURIDAD MEJORADA
 import apiClient from '../apiClient'
-import { AUTH_ENDPOINTS, buildEndpoint } from '@/constants/apiEndpoints'
+import { AUTH_ENDPOINTS } from '@/constants/apiEndpoints'
 import { STORAGE_KEYS, API_CONFIG } from '@/constants/apiConfig'
 import { VALIDATION_RULES, VALIDATION_HELPERS } from '@/constants/validationRules'
 import { CACHE_CONFIG } from '@/constants/cacheConfig'
+import { secureStorage } from '@/utils/security'
 
 // =============================================
 // ESTRUCTURAS DE DATOS Y CONSTANTES
@@ -16,18 +17,17 @@ const TOKEN_KEYS = {
 }
 
 /**
- * Wrapper para localStorage con timeout configurable
+ * Wrapper seguro para almacenamiento de tokens
+ * Ahora usa encriptación para mayor seguridad
  * @type {Object}
  */
 const STORAGE = {
   /**
-   * Guarda un token en localStorage con timestamp
+   * Guarda un token de forma segura con encriptación
    */
   set: (key, value) => {
     if (value) {
-      localStorage.setItem(key, value)
-      // Guardar timestamp para validar expiración
-      localStorage.setItem(`${key}_timestamp`, Date.now().toString())
+      secureStorage.setItem(key, value)
     }
   },
   
@@ -35,35 +35,22 @@ const STORAGE = {
    * Obtiene un token con validación de timeout
    */
   get: (key) => {
-    const value = localStorage.getItem(key)
-    const timestamp = localStorage.getItem(`${key}_timestamp`)
-    
-    // Si el token es muy viejo, limpiarlo
-    if (timestamp && (Date.now() - parseInt(timestamp)) > API_CONFIG.TIMEOUTS.AUTH) {
-      this.remove(key)
-      return null
-    }
-    
-    return value
+    // Usar el timeout de autenticación configurado
+    return secureStorage.getItem(key, API_CONFIG.TIMEOUTS.AUTH)
   },
   
   /**
-   * Elimina un token y su timestamp
+   * Elimina un token de forma segura
    */
   remove: (key) => {
-    localStorage.removeItem(key)
-    localStorage.removeItem(`${key}_timestamp`)
+    secureStorage.removeItem(key)
   },
   
   /**
    * Elimina todos los tokens de autenticación
    */
   clearTokens: () => {
-    Object.values(STORAGE_KEYS).forEach(key => {
-      if (key.includes('token') || key.includes('auth')) {
-        this.remove(key)
-      }
-    })
+    secureStorage.clearTokens([TOKEN_KEYS.AUTH, TOKEN_KEYS.REFRESH])
   }
 }
 
@@ -89,6 +76,40 @@ const validateCredentials = (credentials) => {
   }
   
   if (!VALIDATION_HELPERS.validatePassword(credentials.password)) {
+    errors.push(VALIDATION_RULES.USER.PASSWORD.MESSAGE.COMPLEXITY)
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  }
+}
+
+/**
+ * Valida datos de registro antes de enviarlos
+ * @private
+ * @param {UserData} userData
+ * @returns {{isValid: boolean, errors: string[]}}
+ */
+const validateRegistrationData = (userData) => {
+  const errors = []
+  
+  // Validar alias
+  if (!userData.alias || userData.alias.length < 3) {
+    errors.push('El alias debe tener al menos 3 caracteres')
+  }
+  
+  // Validar email
+  if (!VALIDATION_HELPERS.validateEmail(userData.email)) {
+    errors.push(VALIDATION_RULES.USER.EMAIL.MESSAGE.INVALID)
+  }
+  
+  // Validar contraseña
+  if (userData.password.length < VALIDATION_RULES.USER.PASSWORD.MIN_LENGTH) {
+    errors.push(VALIDATION_RULES.USER.PASSWORD.MESSAGE.LENGTH)
+  }
+  
+  if (!VALIDATION_HELPERS.validatePassword(userData.password)) {
     errors.push(VALIDATION_RULES.USER.PASSWORD.MESSAGE.COMPLEXITY)
   }
   
