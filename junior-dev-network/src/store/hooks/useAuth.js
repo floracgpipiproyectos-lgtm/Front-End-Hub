@@ -1,4 +1,6 @@
 // store/hooks/useAuth.js
+// noinspection UnnecessaryLocalVariableJS
+
 import { useSelector, useDispatch } from 'react-redux'
 import { useCallback } from 'react'
 import {
@@ -9,7 +11,6 @@ import {
     setCredentials,
     clearCredentials
 } from '../slices/authSlice'
-import { authService } from '@/api/services'
 import { STORAGE_KEYS } from '@/constants/apiConfig'
 
 /**

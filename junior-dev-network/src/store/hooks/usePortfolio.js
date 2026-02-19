@@ -1,4 +1,6 @@
 // store/hooks/usePortfolio.js
+// noinspection DuplicatedCode,UnnecessaryLocalVariableJS,GrazieInspection
+
 import { useSelector, useDispatch } from 'react-redux'
 import { useCallback, useMemo } from 'react'
 import {
@@ -8,46 +10,13 @@ import {
     createProject,
     updateProject,
     deleteProject,
-    fetchExperiences,
-    addExperience,
-    fetchEducation,
-    addEducation,
-    fetchCertifications,
-    addCertification,
-    fetchFeaturedSkills,
-    updateFeaturedSkills,
-    updatePortfolioSettings,
-    uploadPortfolioImage,
-    publishPortfolio,
-    fetchPortfolioStats,
-    fetchPortfolioPreview,
-    generateCustomLink,
-
     // Acciones síncronas
     setCurrentProject,
     setProjectFilters,
     addTemporaryProject,
     removeTemporaryProject,
     updateTemporaryProject,
-    addTemporaryExperience,
-    addTemporaryEducation,
-    addTemporaryCertification,
-    addTemporarySkill,
-    setUploadProgress,
-    cancelUpload,
-    filterProjectsByStatus,
-    filterProjectsByVisibility,
-    sortProjectsBy,
-    sortExperiencesBy,
     updateSettingsLocally,
-    incrementViews,
-    incrementContactRequests,
-    updatePortfolioCompleteness,
-    clearPortfolioError,
-    clearTemporaryData,
-    resetPortfolioState,
-    simulatePortfolioEvent,
-
     // Selectores
     selectPortfolioState,
     selectAllProjects,
@@ -63,33 +32,11 @@ import {
     selectPortfolioStats,
     selectPortfolioMeta,
     selectPortfolioStatus,
-    selectPortfolioError,
-
-    // Selectores derivados
-    selectProjectsByStatus,
-    selectProjectsByVisibility,
-    selectPublicProjects,
-    selectDraftProjects,
-    selectCompletedProjects,
-    selectInProgressProjects,
-    selectProjectsByTechnology,
-    selectRecentProjects,
-    selectExperiencesByCompany,
-    selectCurrentExperiences,
-    selectExperiencesByDuration,
-    selectCertificationsByIssuer,
-    selectRecentCertifications,
-    selectTopFeaturedSkills,
-    selectPortfolioCompleteness,
-    selectIsPortfolioPublished,
-    selectPortfolioCustomUrl,
-    selectPortfolioAnalytics,
-    selectPortfolioSEO,
-    selectPortfolioTheme,
-    selectPortfolioLayout
+    selectPortfolioError
 } from '../slices/portfolioSlice'
 import { ProjectStatus, ProjectVisibility } from '@/api/services/portfolioService'
 
+// noinspection GrazieInspection
 /**
  * Hook personalizado para portfolio
  */

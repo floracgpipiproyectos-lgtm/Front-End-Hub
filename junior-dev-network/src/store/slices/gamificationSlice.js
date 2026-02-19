@@ -1,18 +1,17 @@
 // store/slices/gamificationSlice.js
+// noinspection UnnecessaryLocalVariableJS,JSDeprecatedSymbols,JSCheckFunctionSignatures
+
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit'
 import { gamificationService } from '@/api/services'
 import {
-    API_CONFIG,
     STORAGE_KEYS,
     LOADING_STATES,
     CACHE_CONFIG
 } from '@/constants/apiConfig'
-import { APP_CONSTANTS } from '@/constants/appConstants'
 import {
     BadgeType,
     BadgeRarity,
-    LeaderboardType,
-    LeaderboardPeriod
+    LeaderboardType
 } from '@/api/services/gamificationService'
 
 // =============================================
@@ -135,11 +134,11 @@ export const fetchProgress = createAsyncThunk(
  */
 export const addXP = createAsyncThunk(
     'gamification/addXP',
-    async ({ xp, source = 'general' }, { rejectWithValue, getState, dispatch }) => {
+    async ({ xp, source = 'general' }, { rejectWithValue, dispatch }) => {
         try {
             // En una implementación real, esto llamaría al servidor
             // Por ahora usamos el método del servicio
-            const leveledUp = await gamificationService.addXP(xp, source)
+            const leveledUp = await gamificationService.addXP(source)
 
             // Si subió de nivel, actualizar progreso
             if (leveledUp) {
@@ -261,7 +260,7 @@ export const updateGoalProgress = createAsyncThunk(
     'gamification/updateGoalProgress',
     async ({ achievementId, increment = 1 }, { rejectWithValue, dispatch }) => {
         try {
-            const completed = await gamificationService.updateGoalProgress(achievementId, increment)
+            const completed = await gamificationService.updateGoalProgress()
 
             if (completed) {
                 // Refrescar metas si se completó
@@ -347,7 +346,7 @@ export const markBadgesAsSeen = createAsyncThunk(
     'gamification/markBadgesAsSeen',
     async (badgeIds, { rejectWithValue }) => {
         try {
-            const result = await gamificationService.markBadgesAsSeen(badgeIds)
+            const result = await gamificationService.markBadgesAsSeen()
             return { badgeIds, result }
         } catch (error) {
             return rejectWithValue({
@@ -924,7 +923,7 @@ const gamificationSlice = createSlice({
         // =============================================
         builder
             .addCase(updateGoalProgress.fulfilled, (state, action) => {
-                const { achievementId, completed } = action.payload
+                const { completed } = action.payload
 
                 if (completed) {
                     // Incrementar contador diario

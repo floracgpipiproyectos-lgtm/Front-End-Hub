@@ -1,3 +1,5 @@
+// noinspection JSValidateTypes
+
 /**
  * Página de Mentores
  */

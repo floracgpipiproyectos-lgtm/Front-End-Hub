@@ -1,3 +1,5 @@
+// noinspection GrazieInspection
+
 /**
  * @fileoverview Componente LoginForm para autenticación de usuarios
  * Valida credenciales y gestiona el proceso de login con manejo de errores

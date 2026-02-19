@@ -1,4 +1,6 @@
 // cvService.js
+// noinspection GrazieInspection
+
 import apiClient from '../apiClient'
 import { CV_ENDPOINTS, buildEndpoint } from '@/constants/apiEndpoints'
 
@@ -131,43 +133,15 @@ const handleFileUpload = (file, onUploadProgress) => {
   // Agregar callback de progreso si existe
   if (onUploadProgress) {
     config.onUploadProgress = (progressEvent) => {
-      const percentCompleted = Math.round(
-        (progressEvent.loaded * 100) / progressEvent.total
-      )
-      onUploadProgress(percentCompleted)
+      const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total, 2)
+        onUploadProgress(percentCompleted)
     }
   }
 
   return apiClient.post(CV_ENDPOINTS.UPLOAD, formData, config)
 }
 
-/**
- * Helper para filtrar skills por criterios
- * @private
- * @param {Skill[]} skills - Array de skills a filtrar
- * @param {Object} criteria - Criterios de filtrado
- * @returns {Skill[]} Skills filtradas
- */
-const filterSkills = (skills, criteria) => {
-  return skills.filter(skill => {
-    // Filtrar por nivel si está especificado
-    if (criteria.level && skill.level !== criteria.level) {
-      return false
-    }
 
-    // Filtrar por fuente si está especificado
-    if (criteria.source && skill.source !== criteria.source) {
-      return false
-    }
-
-    // Filtrar por confianza mínima si está especificado
-    if (criteria.minConfidence && skill.confidence < criteria.minConfidence) {
-      return false
-    }
-
-    return true
-  })
-}
 
 // =============================================
 // SERVICIO PRINCIPAL DE CV

@@ -1,3 +1,5 @@
+// noinspection GrazieInspection
+
 /**
  * @fileoverview Utilidades para manejo de arrays y objetos
  */
@@ -220,6 +222,7 @@ export const chunk = (arr, size) => {
 /**
  * Cuenta ocurrencias de elementos en un array
  * @param {Array} arr - Array a contar
+ * @param keyFn
  * @returns {Object} Objeto con conteos
  */
 export const countBy = (arr, keyFn = null) => {

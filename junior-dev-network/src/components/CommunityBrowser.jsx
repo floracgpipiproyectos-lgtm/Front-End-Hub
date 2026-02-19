@@ -6,6 +6,7 @@
 import React, { useState } from 'react'
 import { useNetwork } from '@/store/hooks/useNetwork'
 
+// noinspection GrazieInspection
 /**
  * Componente que renderiza un navegador de comunidades con filtros y búsqueda
  * @component

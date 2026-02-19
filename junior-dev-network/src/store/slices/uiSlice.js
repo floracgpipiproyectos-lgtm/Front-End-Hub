@@ -1,4 +1,6 @@
 // store/slices/uiSlice.js
+// noinspection UnnecessaryLocalVariableJS,JSDeprecatedSymbols
+
 import { createSlice } from '@reduxjs/toolkit'
 import { STORAGE_KEYS } from '@/constants/apiConfig'
 import { LOADING_STATES } from '@/constants/apiConfig'

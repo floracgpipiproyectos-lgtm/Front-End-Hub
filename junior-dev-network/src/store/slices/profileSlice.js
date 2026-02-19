@@ -1,7 +1,8 @@
 // store/slices/profileSlice.js
+// noinspection UnnecessaryLocalVariableJS
+
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { profileService } from '@/api/services'
-import { STORAGE_KEYS } from '@/constants/apiConfig'
 import { LOADING_STATES } from '@/constants/apiConfig'
 
 // Async Thunks

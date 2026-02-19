@@ -7,7 +7,7 @@ import { FiTrendingUp } from 'react-icons/fi'
  * Componente para mostrar las insignias del usuario
  * @component
  * @param {Array<Object>} badges - Array de insignias con datos de progreso
- * @returns {JSX.Element}
+ * @returns {React.JSX.Element}
  */
 export default function BadgesProgress({ badges = [] }) {
   const defaultBadges = [

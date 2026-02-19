@@ -12,19 +12,31 @@ export default function MentorArea() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const loadMentors = async () => {
-      try {
-        const data = await networkService.getMentorSuggestions()
-        setMentors(data.slice(0, 4)) // Show first 4
-      } catch (error) {
-        console.error('Error loading mentors:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
+    let isMounted = true;
+    setLoading(true);
 
-    loadMentors()
-  }, [])
+    networkService.getMentorSuggestions()
+        .then((data) => {
+          if (isMounted) {
+            setMentors(data.slice(0, 4));
+          }
+        })
+        .catch((error) => {
+          if (isMounted) {
+            console.error('Error loading mentors:', error);
+          }
+        })
+        .finally(() => {
+          if (isMounted) {
+            setLoading(false);
+          }
+        });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
 
   if (loading) {
     return <Spinner />

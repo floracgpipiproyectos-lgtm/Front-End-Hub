@@ -1,3 +1,5 @@
+// noinspection JSDeprecatedSymbols
+
 /**
  * Security utilities for token storage
  * Provides encryption for localStorage to mitigate XSS attacks
@@ -10,7 +12,7 @@ const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY || 'junior-dev-networ
 /**
  * Simple obfuscation function to make token storage less vulnerable to casual XSS
  * @param {string} text - Text to obfuscate
- * @returns {string} Obfuscated text
+ * @returns {string|null} Obfuscated text
  */
 const obfuscate = (text) => {
   if (!text) return null
@@ -32,7 +34,7 @@ const obfuscate = (text) => {
 /**
  * Deobfuscate text
  * @param {string} text - Obfuscated text
- * @returns {string} Original text
+ * @returns {string|null} Original text
  */
 const deobfuscate = (text) => {
   if (!text) return null
@@ -78,7 +80,7 @@ export const secureStorage = {
   /**
    * Retrieve token securely
    * @param {string} key - Storage key
-   * @param {number} maxAge - Maximum age in milliseconds
+   * @param {null} maxAge - Maximum age in milliseconds
    * @returns {string|null} Original value or null if expired/not found
    */
   getItem: (key, maxAge = null) => {

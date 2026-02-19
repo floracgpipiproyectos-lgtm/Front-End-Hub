@@ -1,3 +1,5 @@
+// noinspection GrazieInspection
+
 /**
  * @fileoverview useUI Hook - Custom React hook for UI state management
  * @description Provides convenient access to UI state and actions from Redux store
@@ -48,15 +50,13 @@ import {
     selectIsScrollLocked,
     selectIsOnboardingCompleted,
     selectFeatureFlags,
-    selectIsFeatureEnabled,
-    
     // Selectores derivados
     selectUILayout,
     selectUITheme,
     selectUINotifications,
     selectUILoadingState
 } from '../slices/uiSlice'
-import { ThemeMode, NotificationType, ModalSize } from '../slices/uiSlice'
+import { ThemeMode, ModalSize } from '../slices/uiSlice'
 
 /**
  * Hook personalizado para UI
@@ -171,6 +171,7 @@ export const useUI = () => {
         dispatch(startLoading({ text, blocking }))
     }, [dispatch])
     
+    // noinspection JSUnusedLocalSymbols
     const updateLoadingProgressAction = useCallback((progress) => {
         // Esta acción no existe en el slice, sería necesario agregarla
         // dispatch(updateLoadingProgress(progress))
@@ -219,7 +220,7 @@ export const useUI = () => {
         if (themeMode === ThemeMode.SYSTEM && typeof window !== 'undefined') {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
             
-            const handleChange = (e) => {
+            const handleChange = () => {
                 // Actualizar tema basado en preferencia del sistema
                 // Esta lógica sería manejada por el selector selectIsDarkMode
             }

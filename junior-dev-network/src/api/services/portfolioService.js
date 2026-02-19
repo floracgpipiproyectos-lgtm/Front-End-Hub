@@ -1,4 +1,6 @@
 // portfolioService.js
+// noinspection GrazieInspection
+
 import apiClient from '../apiClient'
 import { PORTFOLIO_ENDPOINTS } from '@/constants/apiEndpoints'
 import { PortfolioValidator } from '@/validations/index'
@@ -189,6 +191,7 @@ export const DeploymentPlatform = {
 // CLASE PORTFOLIO SERVICE
 // =============================================
 
+// noinspection UnnecessaryLocalVariableJS,ExceptionCaughtLocallyJS,GrazieInspection,BadExpressionStatementJS,JSIgnoredPromiseFromCall
 /**
  * Servicio de portafolio mejorado para JuniorDev Network
  * Implementa arquitectura modular con separación de responsabilidades
@@ -255,8 +258,8 @@ export class PortfolioService {
 
   /**
    * Obtiene el portafolio actual del usuario
-   * @param {string} [userId] - ID del usuario (opcional, usa usuario actual si no se proporciona)
-   * @returns {Promise<PortfolioData>} Datos del portafolio
+   * @param {null} [userId] - ID del usuario (opcional, usa usuario actual si no se proporciona)
+   * @returns {Promise<{}>} Datos del portafolio
    * @throws {Error} Si el usuario no está autenticado o el portafolio no existe
    * 
    * @example
@@ -284,7 +287,7 @@ export class PortfolioService {
   /**
    * Genera un nuevo portafolio automáticamente basado en el perfil del usuario
    * @param {PortfolioOptions} [options={}] - Opciones de generación
-   * @param {string} [userId] - ID del usuario (opcional, usa usuario actual)
+   * @param {null} [userId] - ID del usuario (opcional, usa usuario actual)
    * @returns {Promise<PortfolioGenerationResult>} Resultado de la generación
    * @throws {Error} Si no hay suficiente información del usuario
    * 
@@ -344,12 +347,8 @@ export class PortfolioService {
 
       return result
     } catch (error) {
-      const errorResult = {
-        success: false,
-        errorMessage: error.message,
-        generationTimeMs: performance.now() - startTime
-      }
-      
+      performance.now() - startTime;
+
       console.error('Error generating portfolio:', error)
       throw this.handleError(error)
     }
@@ -359,8 +358,8 @@ export class PortfolioService {
    * Actualiza un portafolio existente
    * @param {string} portfolioId - ID del portafolio a actualizar
    * @param {Partial<PortfolioData>} updatedData - Datos actualizados
-   * @param {string} [userId] - ID del usuario para verificación de propiedad
-   * @returns {Promise<PortfolioData>} Portafolio actualizado
+   * @param {null} [userId] - ID del usuario para verificación de propiedad
+   * @returns {Promise<{}>} Portafolio actualizado
    * @throws {Error} Si el usuario no tiene permisos o el portafolio no existe
    * 
    * @example
@@ -448,16 +447,11 @@ export class PortfolioService {
 
       return result
     } catch (error) {
-      const errorResult = {
-        deploymentId: `dep_${Date.now()}`,
-        portfolioId,
-        status: DeploymentStatus.FAILED,
-        startedAt: new Date(),
-        completedAt: new Date(),
-        errorMessage: error.message,
-        deploymentTimeMs: performance.now() - startTime
-      }
-      
+      `dep_${Date.now()}`;
+      new Date();
+      new Date();
+      performance.now() - startTime;
+
       console.error('Error deploying portfolio:', error)
       throw this.handleError(error)
     }
@@ -537,9 +531,9 @@ export class PortfolioService {
   /**
    * Clona un portafolio existente creando una nueva copia
    * @param {string} sourcePortfolioId - ID del portafolio a clonar
-   * @param {string} [newOwnerId] - ID del nuevo propietario
+   * @param {null} [newOwnerId] - ID del nuevo propietario
    * @param {Object} customizations - Personalizaciones opcionales
-   * @returns {Promise<PortfolioData>} Portafolio clonado
+   * @returns {Promise<{}>} Portafolio clonado
    * @throws {Error} Si el portafolio source no existe o no se puede clonar
    * 
    * @example
@@ -656,16 +650,15 @@ export class PortfolioService {
 
   /**
    * Obtiene estadísticas detalladas del portafolio
-   * @param {string} portfolioId - ID del portafolio
    * @param {string} [timeframe='30d'] - Período de tiempo (7d, 30d, 90d, all_time)
    * @returns {Promise<Object>} Estadísticas del portafolio
    * @throws {Error} Si no se pueden obtener las estadísticas
-   * 
+   *
    * @example
    * const stats = await portfolioService.getPortfolioStats('portfolio_123', '7d')
    * console.log('Vistas esta semana:', stats.views)
    */
-  async getPortfolioStats(portfolioId, timeframe = '30d') {
+  async getPortfolioStats(timeframe = '30d') {
     try {
       const response = await this.apiClient.get(
         `${PORTFOLIO_ENDPOINTS.GET_STATS}/${portfolioId}`,

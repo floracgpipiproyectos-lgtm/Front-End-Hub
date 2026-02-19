@@ -33,30 +33,38 @@ const GamificationDashboard = () => {
         loadLeaderboard,
         loadGoals,
         sendNotification,
-        markNotificationRead,
-
         // Estados
         isLoading,
-        hasError,
-
-        // Utilitarios
-        getBadgesByType
+        hasError
     } = useGamification()
 
     /**
      * Carga todos los datos de gamificación al montar
      */
     useEffect(() => {
-        const loadData = async () => {
-            await Promise.all([
-                loadProgress(),
-                loadUserBadges(),
-                loadLeaderboard({ type: 'weekly' }),
-                loadGoals()
-            ])
-        }
+        let isMounted = true;
 
-        loadData()
+        const loadData = async () => {
+            try {
+                await Promise.all([
+                    loadProgress(),
+                    loadUserBadges(),
+                    loadLeaderboard({ type: 'weekly' }),
+                    loadGoals()
+                ]);
+            } catch (error) {
+                if (isMounted) {
+                    console.error("Error loading gamification data:", error);
+                }
+            }
+        };
+
+        loadData().then(() => console.log("Gamification data loaded"))
+            .catch(error => console.error(error));
+
+        return () => {
+            isMounted = false;
+        };
     }, [loadProgress, loadUserBadges, loadLeaderboard, loadGoals])
 
     /**

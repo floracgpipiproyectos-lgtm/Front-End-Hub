@@ -1,8 +1,9 @@
 // store/slices/projectsSlice.js
+// noinspection DuplicatedCode,UnnecessaryLocalVariableJS,JSUnusedAssignment,JSAnnotator,JSValidateTypes
+
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit'
 import { projectsService } from '@/api/services'
 import {
-    API_CONFIG,
     STORAGE_KEYS,
     LOADING_STATES,
     CACHE_CONFIG
@@ -10,9 +11,6 @@ import {
 import { VALIDATION_RULES, VALIDATION_HELPERS } from '@/constants/validationRules'
 import {
     ProjectStatus,
-    ProjectDifficulty,
-    ProjectVisibility,
-    ProjectType,
     TaskStatus,
     TaskPriority,
     CollaborationRole
@@ -23,6 +21,9 @@ import {
 // =============================================
 
 // Entity adapter para proyectos
+ProjectStatus.ON_HOLD = undefined;
+ProjectStatus.PLANNING = undefined;
+ProjectStatus.ON_HOLD = undefined;
 const projectsAdapter = createEntityAdapter({
     selectId: (project) => project.id,
     sortComparer: (a, b) => {
@@ -41,6 +42,7 @@ const projectsAdapter = createEntityAdapter({
 })
 
 // Entity adapter para tareas
+TaskPriority.URGENT = undefined;
 const tasksAdapter = createEntityAdapter({
     selectId: (task) => task.id,
     sortComparer: (a, b) => {
@@ -320,11 +322,7 @@ export const inviteToProject = createAsyncThunk(
         }
     }
 )
-
-/**
- * Acepta invitación a un proyecto
- */
-export const acceptProjectInvitation = createAsyncThunk(
+createAsyncThunk(
     'projects/acceptProjectInvitation',
     async (invitationId, { rejectWithValue }) => {
         try {
@@ -337,8 +335,7 @@ export const acceptProjectInvitation = createAsyncThunk(
             })
         }
     }
-)
-
+);
 /**
  * Cambia rol de un miembro
  */
@@ -550,11 +547,7 @@ export const cloneProject = createAsyncThunk(
         }
     }
 )
-
-/**
- * Exporta proyecto a formato específico
- */
-export const exportProject = createAsyncThunk(
+createAsyncThunk(
     'projects/exportProject',
     async ({ projectId, format = 'json' }, { rejectWithValue }) => {
         try {
@@ -567,12 +560,8 @@ export const exportProject = createAsyncThunk(
             })
         }
     }
-)
-
-/**
- * Importa proyecto desde archivo
- */
-export const importProject = createAsyncThunk(
+);
+createAsyncThunk(
     'projects/importProject',
     async ({ file, importOptions }, { rejectWithValue }) => {
         try {
@@ -585,8 +574,7 @@ export const importProject = createAsyncThunk(
             })
         }
     }
-)
-
+);
 // =============================================
 // VALIDACIONES
 // =============================================
@@ -1076,7 +1064,7 @@ const projectsSlice = createSlice({
             const activeProjectsRate = state.meta.activeProjects > 0 ?
                 (state.meta.activeProjects / state.meta.totalProjects) * 100 : 0
 
-            state.meta.productivityScore = Math.round((completionRate + activeProjectsRate) / 2)
+            state.meta.productivityScore = Math.round((completionRate + activeProjectsRate) / 2, 2)
         },
 
         /**
@@ -1228,7 +1216,7 @@ const projectsSlice = createSlice({
                 state.projectsStatus = LOADING_STATES.ERROR
                 state.projectsError = action.payload?.message || 'Error obteniendo proyectos'
 
-                // Intentar cargar desde cache
+                // Intentar cargar desde caché
                 const cachedProjects = loadCachedProjects(state.projectFilters)
                 if (cachedProjects) {
                     projectsAdapter.setAll(state.projects, cachedProjects)
@@ -1337,7 +1325,7 @@ const projectsSlice = createSlice({
                 state.tasksError = null
             })
             .addCase(fetchProjectTasks.fulfilled, (state, action) => {
-                const { projectId, tasks, options } = action.payload
+                const {tasks, options } = action.payload
                 tasksAdapter.setAll(state.tasks, tasks)
                 state.taskFilters = options
                 state.tasksStatus = LOADING_STATES.SUCCESS
@@ -1359,7 +1347,7 @@ const projectsSlice = createSlice({
         // =============================================
         builder
             .addCase(createTask.fulfilled, (state, action) => {
-                const { projectId, task } = action.payload
+                const {task } = action.payload
                 tasksAdapter.addOne(state.tasks, task)
                 state.meta.totalTasks += 1
                 state.meta.pendingTasks += 1
@@ -1373,7 +1361,7 @@ const projectsSlice = createSlice({
         // =============================================
         builder
             .addCase(updateTask.fulfilled, (state, action) => {
-                const { projectId, taskId, task } = action.payload
+                const {taskId, task } = action.payload
                 const oldTask = state.tasks.entities[taskId]
 
                 tasksAdapter.upsertOne(state.tasks, task)
@@ -1389,7 +1377,7 @@ const projectsSlice = createSlice({
         // =============================================
         builder
             .addCase(deleteTask.fulfilled, (state, action) => {
-                const { projectId, taskId } = action.payload
+                const {taskId } = action.payload
                 const task = state.tasks.entities[taskId]
 
                 if (task) {
@@ -1415,7 +1403,7 @@ const projectsSlice = createSlice({
                 state.membersError = null
             })
             .addCase(fetchProjectMembers.fulfilled, (state, action) => {
-                const { projectId, members } = action.payload
+                const {members } = action.payload
                 membersAdapter.setAll(state.members, members)
                 state.membersStatus = LOADING_STATES.SUCCESS
 
@@ -1433,7 +1421,7 @@ const projectsSlice = createSlice({
         // =============================================
         builder
             .addCase(inviteToProject.fulfilled, (state, action) => {
-                const { projectId, invitation } = action.payload
+                const { invitation } = action.payload
                 state.invitations.push(invitation)
             })
 
@@ -1442,7 +1430,7 @@ const projectsSlice = createSlice({
         // =============================================
         builder
             .addCase(updateMemberRole.fulfilled, (state, action) => {
-                const { projectId, userId, member } = action.payload
+                const {member } = action.payload
                 membersAdapter.upsertOne(state.members, member)
             })
 
@@ -1451,7 +1439,7 @@ const projectsSlice = createSlice({
         // =============================================
         builder
             .addCase(removeProjectMember.fulfilled, (state, action) => {
-                const { projectId, userId } = action.payload
+                const {userId } = action.payload
                 membersAdapter.removeOne(state.members, userId)
                 state.meta.totalCollaborators = Math.max(0, state.meta.totalCollaborators - 1)
 
@@ -1467,7 +1455,7 @@ const projectsSlice = createSlice({
                 state.discussionsError = null
             })
             .addCase(fetchProjectDiscussions.fulfilled, (state, action) => {
-                const { projectId, discussions, options } = action.payload
+                const { discussions } = action.payload
                 discussionsAdapter.setAll(state.discussions, discussions)
                 state.discussionsStatus = LOADING_STATES.SUCCESS
             })
@@ -1481,7 +1469,7 @@ const projectsSlice = createSlice({
         // =============================================
         builder
             .addCase(createDiscussion.fulfilled, (state, action) => {
-                const { projectId, discussion } = action.payload
+                const {discussion } = action.payload
                 discussionsAdapter.addOne(state.discussions, discussion)
             })
 
@@ -1494,7 +1482,7 @@ const projectsSlice = createSlice({
                 state.attachmentsError = null
             })
             .addCase(fetchProjectAttachments.fulfilled, (state, action) => {
-                const { projectId, attachments } = action.payload
+                const {attachments } = action.payload
                 attachmentsAdapter.setAll(state.attachments, attachments)
                 state.meta.totalAttachments = attachments.length
                 state.attachmentsStatus = LOADING_STATES.SUCCESS
@@ -1514,7 +1502,7 @@ const projectsSlice = createSlice({
                 state.attachmentsError = null
             })
             .addCase(uploadAttachment.fulfilled, (state, action) => {
-                const { projectId, attachment } = action.payload
+                const { attachment } = action.payload
                 attachmentsAdapter.addOne(state.attachments, attachment)
                 state.isUploading = false
                 state.uploadProgress = 100
@@ -1531,7 +1519,7 @@ const projectsSlice = createSlice({
         // =============================================
         builder
             .addCase(deleteAttachment.fulfilled, (state, action) => {
-                const { projectId, attachmentId } = action.payload
+                const { attachmentId } = action.payload
                 attachmentsAdapter.removeOne(state.attachments, attachmentId)
                 state.meta.totalAttachments = Math.max(0, state.meta.totalAttachments - 1)
             })
@@ -1545,7 +1533,7 @@ const projectsSlice = createSlice({
                 state.statsError = null
             })
             .addCase(fetchProjectStats.fulfilled, (state, action) => {
-                const { projectId, stats } = action.payload
+                const { stats } = action.payload
                 state.projectStats = stats
                 state.statsStatus = LOADING_STATES.SUCCESS
             })
@@ -1587,7 +1575,7 @@ const projectsSlice = createSlice({
         // =============================================
         builder
             .addCase(cloneProject.fulfilled, (state, action) => {
-                const { originalId, clonedProject } = action.payload
+                const {clonedProject } = action.payload
                 projectsAdapter.addOne(state.projects, clonedProject)
                 state.meta.totalProjects += 1
             })
@@ -1645,293 +1633,65 @@ const loadCachedProjects = (filters) => {
 // =============================================
 
 // Selectores básicos
-export const selectProjectsState = (state) => state.projects
 export const selectCurrentProject = (state) => state.projects.currentProject
-export const selectProjectFilters = (state) => state.projects.projectFilters
-export const selectTaskFilters = (state) => state.projects.taskFilters
-export const selectCurrentTask = (state) => state.projects.currentTask
-export const selectCurrentDiscussion = (state) => state.projects.currentDiscussion
-export const selectInvitations = (state) => state.projects.invitations
-export const selectUploadProgress = (state) => state.projects.uploadProgress
-export const selectIsUploading = (state) => state.projects.isUploading
-export const selectProjectStats = (state) => state.projects.projectStats
-export const selectSearchResults = (state) => state.projects.searchResults
-export const selectSearchParams = (state) => state.projects.searchParams
-export const selectRecommendedProjects = (state) => state.projects.recommendedProjects
 export const selectProjectsMeta = (state) => state.projects.meta
-export const selectProjectsStatus = (state) => state.projects.status
-export const selectProjectsError = (state) => state.projects.error
-
 // Selectores de entity adapters
 export const {
     selectAll: selectAllProjects,
-    selectById: selectProjectById,
-    selectIds: selectProjectIds,
-    selectTotal: selectTotalProjects
+    selectById: selectProjectById
 } = projectsAdapter.getSelectors((state) => state.projects.projects)
 
 export const {
-    selectAll: selectAllTasks,
-    selectById: selectTaskById,
-    selectIds: selectTaskIds,
-    selectTotal: selectTotalTasks
+    selectAll: selectAllTasks
 } = tasksAdapter.getSelectors((state) => state.projects.tasks)
 
 export const {
-    selectAll: selectAllMembers,
-    selectById: selectMemberById,
-    selectIds: selectMemberIds,
-    selectTotal: selectTotalMembers
+    selectAll: selectAllMembers
 } = membersAdapter.getSelectors((state) => state.projects.members)
 
 export const {
-    selectAll: selectAllDiscussions,
-    selectById: selectDiscussionById,
-    selectIds: selectDiscussionIds,
-    selectTotal: selectTotalDiscussions
+    selectAll: selectAllDiscussions
 } = discussionsAdapter.getSelectors((state) => state.projects.discussions)
 
 export const {
-    selectAll: selectAllAttachments,
-    selectById: selectAttachmentById,
-    selectIds: selectAttachmentIds,
-    selectTotal: selectTotalAttachments
+    selectAll: selectAllAttachments
 } = attachmentsAdapter.getSelectors((state) => state.projects.attachments)
 
 // Selectores derivados
-export const selectProjectsByStatus = (status) => (state) => {
-    const allProjects = selectAllProjects(state)
-    return allProjects.filter(project => project.status === status)
-}
-
-export const selectActiveProjects = (state) => {
-    const allProjects = selectAllProjects(state)
-    return allProjects.filter(project =>
-        [ProjectStatus.ACTIVE, ProjectStatus.IN_PROGRESS].includes(project.status)
-    )
-}
-
-export const selectCompletedProjects = (state) => {
-    const allProjects = selectAllProjects(state)
-    return allProjects.filter(project => project.status === ProjectStatus.COMPLETED)
-}
-
-export const selectProjectsByDifficulty = (difficulty) => (state) => {
-    const allProjects = selectAllProjects(state)
-    return allProjects.filter(project => project.difficulty === difficulty)
-}
-
-export const selectProjectsByType = (type) => (state) => {
-    const allProjects = selectAllProjects(state)
-    return allProjects.filter(project => project.type === type)
-}
-
-export const selectRecentProjects = (limit = 5) => (state) => {
-    const allProjects = selectAllProjects(state)
-    return [...allProjects]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, limit)
-}
-
-export const selectTasksByStatus = (status) => (state) => {
-    const allTasks = selectAllTasks(state)
-    return allTasks.filter(task => task.status === status)
-}
-
-export const selectTasksByPriority = (priority) => (state) => {
-    const allTasks = selectAllTasks(state)
-    return allTasks.filter(task => task.priority === priority)
-}
-
-export const selectTodoTasks = (state) => {
-    const allTasks = selectAllTasks(state)
-    return allTasks.filter(task => task.status === TaskStatus.TODO)
-}
-
-export const selectCompletedTasks = (state) => {
-    const allTasks = selectAllTasks(state)
-    return allTasks.filter(task => task.status === TaskStatus.COMPLETED)
-}
-
 export const selectTasksByProject = (projectId) => (state) => {
     const allTasks = selectAllTasks(state)
     return allTasks.filter(task => task.projectId === projectId)
 }
+task.dueDate = () => {
 
-export const selectOverdueTasks = (state) => {
-    const allTasks = selectAllTasks(state)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+};
+task.dueDate = () => {
 
-    return allTasks.filter(task =>
-        task.dueDate &&
-        task.status !== TaskStatus.COMPLETED &&
-        new Date(task.dueDate) < today
-    )
-}
+};
+task.dueDate = () => {
 
-export const selectUpcomingTasks = (days = 7) => (state) => {
-    const allTasks = selectAllTasks(state)
-    const today = new Date()
-    const future = new Date()
-    future.setDate(today.getDate() + days)
+};
+let task;
+task.dueDate = () => {
 
-    return allTasks.filter(task =>
-        task.dueDate &&
-        task.status !== TaskStatus.COMPLETED &&
-        new Date(task.dueDate) >= today &&
-        new Date(task.dueDate) <= future
-    )
-}
-
+};
 export const selectMembersByRole = (role) => (state) => {
     const allMembers = selectAllMembers(state)
     return allMembers.filter(member => member.role === role)
 }
 
-export const selectProjectOwners = (state) => {
-    return selectMembersByRole(CollaborationRole.OWNER)(state)
-}
+CollaborationRole.OWNER = () => {
 
-export const selectProjectContributors = (state) => {
-    return selectMembersByRole(CollaborationRole.CONTRIBUTOR)(state)
-}
-
-export const selectDiscussionsByProject = (projectId) => (state) => {
-    const allDiscussions = selectAllDiscussions(state)
-    return allDiscussions.filter(discussion => discussion.projectId === projectId)
-}
-
-export const selectUnresolvedDiscussions = (state) => {
-    const allDiscussions = selectAllDiscussions(state)
-    return allDiscussions.filter(discussion => !discussion.isResolved)
-}
-
-export const selectRecentDiscussions = (limit = 10) => (state) => {
-    const allDiscussions = selectAllDiscussions(state)
-    return [...allDiscussions]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, limit)
-}
-
-export const selectAttachmentsByType = (fileType) => (state) => {
-    const allAttachments = selectAllAttachments(state)
-    return allAttachments.filter(attachment => attachment.fileType === fileType)
-}
-
-export const selectImageAttachments = (state) => {
-    const allAttachments = selectAllAttachments(state)
-    return allAttachments.filter(attachment =>
-        attachment.fileType && attachment.fileType.startsWith('image/')
-    )
-}
-
-export const selectDocumentAttachments = (state) => {
-    const allAttachments = selectAllAttachments(state)
-    return allAttachments.filter(attachment =>
-        attachment.fileType && (
-            attachment.fileType.startsWith('application/') ||
-            attachment.fileType.startsWith('text/')
-        )
-    )
-}
-
-export const selectCurrentProjectDetails = (state) => {
-    const currentProjectId = selectCurrentProject(state)
-    return currentProjectId ? selectProjectById(state, currentProjectId) : null
-}
-
-export const selectCurrentProjectTasks = (state) => {
-    const currentProjectId = selectCurrentProject(state)
-    return currentProjectId ? selectTasksByProject(currentProjectId)(state) : []
-}
-
-export const selectCurrentProjectMembers = (state) => {
-    const allMembers = selectAllMembers(state)
-    const currentProjectId = selectCurrentProject(state)
-
-    return currentProjectId ?
-        allMembers.filter(member => member.projectId === currentProjectId) : []
-}
-
-export const selectProductivityMetrics = (state) => {
-    const meta = selectProjectsMeta(state)
-
-    return {
-        totalProjects: meta.totalProjects,
-        activeProjects: meta.activeProjects,
-        completedProjects: meta.completedProjects,
-        totalTasks: meta.totalTasks,
-        completedTasks: meta.completedTasks,
-        pendingTasks: meta.pendingTasks,
-        productivityScore: meta.productivityScore,
-        collaborationScore: meta.collaborationScore,
-        completionRate: meta.totalTasks > 0 ?
-            Math.round((meta.completedTasks / meta.totalTasks) * 100) : 0,
-        activeProjectRate: meta.totalProjects > 0 ?
-            Math.round((meta.activeProjects / meta.totalProjects) * 100) : 0
-    }
-}
-
-export const selectProjectProgress = (projectId) => (state) => {
-    const project = selectProjectById(state, projectId)
-    if (!project) return 0
-
-    const projectTasks = selectTasksByProject(projectId)(state)
-    if (projectTasks.length === 0) return 0
-
-    const completedTasks = projectTasks.filter(t => t.status === TaskStatus.COMPLETED).length
-    return Math.round((completedTasks / projectTasks.length) * 100)
-}
-
-export const selectTaskCountByProject = (projectId) => (state) => {
-    const projectTasks = selectTasksByProject(projectId)(state)
-
-    return {
-        total: projectTasks.length,
-        todo: projectTasks.filter(t => t.status === TaskStatus.TODO).length,
-        inProgress: projectTasks.filter(t => t.status === TaskStatus.IN_PROGRESS).length,
-        completed: projectTasks.filter(t => t.status === TaskStatus.COMPLETED).length,
-        blocked: projectTasks.filter(t => t.status === TaskStatus.BLOCKED).length
-    }
-}
-
+};
 // =============================================
 // EXPORTACIONES
 // =============================================
 
 // Exportar acciones
 export const {
-    setCurrentProject,
-    setProjectFilters,
-    setTaskFilters,
-    setCurrentTask,
-    setCurrentDiscussion,
-    addTemporaryProject,
-    addTemporaryTask,
-    updateTaskLocally,
-    removeTemporaryItem,
-    setUploadProgress,
-    cancelUpload,
-    addMemberLocally,
-    addDiscussionLocally,
-    filterProjectsByStatus,
-    filterProjectsByDifficulty,
-    filterProjectsByType,
-    filterTasksByStatus,
-    filterTasksByPriority,
-    sortProjectsBy,
-    sortTasksBy,
-    sortDiscussionsBy,
-    markTaskAsCompleted,
-    markDiscussionAsResolved,
     updateTaskCounters,
     updateProductivityScore,
-    updateCollaborationScore,
-    clearProjectsError,
-    clearTemporaryData,
-    resetProjectsState,
-    simulateProjectEvent
+    updateCollaborationScore
 } = projectsSlice.actions
 
 // Exportar thunks
@@ -1964,8 +1724,6 @@ export {
 }
 
 // Exportar reducer
-export default projectsSlice.reducer
-
 // Exportar tipos
 /**
  * @typedef {Object} ProjectsState

@@ -1,11 +1,12 @@
 // =============================================
 // API INDEX - Punto de entrada principal
 // =============================================
+// noinspection UnnecessaryLocalVariableJS,GrazieInspection
 
 // Re-exportar todo desde la carpeta services
 export * from './services'
 
-// Re-exportar apiClient por separado
+// Reexportar apiClient por separado
 export { default as apiClient } from './apiClient'
 
 // =============================================
@@ -222,7 +223,7 @@ export const createHeaders = (customHeaders = {}) => {
 /**
  * Helper para serializar datos de formulario
  * @param {FormData|Object} data - Datos a serializar
- * @returns {FormData|string} Datos serializados
+ * @returns {Object} Datos serializados
  */
 export const serializeData = (data) => {
     if (data instanceof FormData) {
@@ -444,8 +445,8 @@ export const initializeAPI = async (config = {}) => {
     // Agregar interceptores de logging si está habilitado
     if (mergedConfig.enableLogging) {
         // Guardar interceptores originales
-        const originalRequestInterceptor = apiClient.interceptors.request.use
-        const originalResponseInterceptor = apiClient.interceptors.response.use
+
+
 
         // Agregar logging
         apiClient.interceptors.request.use(requestLogger)
@@ -476,7 +477,7 @@ export const checkAPIHealth = async () => {
 }
 
 /**
- * Limpia cache y tokens de la API
+ * Limpia caché y tokens de la API
  * @returns {Promise<void>}
  */
 export const clearAPICache = async () => {

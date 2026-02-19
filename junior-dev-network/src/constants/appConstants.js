@@ -116,25 +116,5 @@ export const APP_STATES = {
     MAINTENANCE: 'maintenance'
 };
 
-/**
- * Niveles de log
- */
-export const LOG_LEVELS = {
-    DEBUG: 'debug',
-    INFO: 'info',
-    WARN: 'warn',
-    ERROR: 'error',
-    CRITICAL: 'critical'
-};
 
-/**
- * Tipos de contenido
- */
-export const CONTENT_TYPES = {
-    TEXT: 'text',
-    IMAGE: 'image',
-    VIDEO: 'video',
-    PDF: 'pdf',
-    CODE: 'code',
-    LINK: 'link'
-};
+

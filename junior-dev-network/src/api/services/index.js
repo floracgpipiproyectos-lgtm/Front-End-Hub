@@ -1,4 +1,5 @@
 // services/index.js - VERSIÓN ACTUALIZADA
+// noinspection GrazieInspection
 
 // Importar constantes para uso global
 import { APP_CONSTANTS, FEATURE_FLAGS } from '@/constants'
@@ -65,7 +66,7 @@ export default services
 /**
  * Inicializa servicios con configuración mejorada
  */
-export const initializeServices = async (config = {}) => {
+export const initializeServices = async () => {
     const startTime = Date.now()
 
     console.log(`🚀 Inicializando servicios (${APP_CONSTANTS.APP_VERSION})...`)

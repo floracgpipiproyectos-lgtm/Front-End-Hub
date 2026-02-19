@@ -5,26 +5,38 @@ import { useState, useEffect } from 'react'
 import Card from '../common/Card'
 import ProjectCard from './ProjectCard'
 import Spinner from '../common/Spinner'
-import { projectService } from '../../api/services/projectService'
+import { projectService } from '@/api/index.js'
 
 export default function ProjectList() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const data = await projectService.getSuggestedProjects()
-        setProjects(data)
-      } catch (error) {
-        console.error('Error loading projects:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
+    let isMounted = true;
+    setLoading(true);
 
-    loadProjects()
-  }, [])
+    projectService.getSuggestedProjects()
+        .then((data) => {
+          if (isMounted) {
+            setProjects(data);
+          }
+        })
+        .catch((error) => {
+          if (isMounted) {
+            console.error('Error loading projects:', error);
+          }
+        })
+        .finally(() => {
+          if (isMounted) {
+            setLoading(false);
+          }
+        });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
 
   if (loading) {
     return <Spinner />

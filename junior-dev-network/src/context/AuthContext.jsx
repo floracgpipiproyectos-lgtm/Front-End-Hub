@@ -1,3 +1,5 @@
+// noinspection GrazieInspection
+
 import { createContext, useState, useEffect, useContext } from 'react'
 import { authService } from '@/api/services/authService'
 
@@ -15,27 +17,27 @@ export const AuthProvider = ({ children }) => {
 
   // Verificar si hay sesión activa al cargar
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        // Intentar obtener usuario desde cache
-        const cachedUser = authService.getCachedUser()
-        
-        if (cachedUser && authService.isAuthenticated()) {
-          setUser(cachedUser)
-        } else {
-          // Limpiar si no hay sesión válida
-          localStorage.removeItem('token')
-          localStorage.removeItem('user')
-        }
-      } catch (err) {
-        console.error('Error inicializando auth:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
+    setLoading(true);
 
-    initAuth()
-  }, [])
+    Promise.resolve()
+        .then(() => {
+          const cachedUser = authService.getCachedUser();
+
+          if (cachedUser && authService.isAuthenticated()) {
+            setUser(cachedUser);
+          } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          }
+        })
+        .catch((err) => {
+          console.error('Error inicializando auth:', err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+
+  }, []);
 
   /**
    * Inicia sesión usando el servicio de autenticación real

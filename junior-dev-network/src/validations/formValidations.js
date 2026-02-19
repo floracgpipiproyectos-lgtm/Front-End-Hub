@@ -1,3 +1,5 @@
+// noinspection JSDeprecatedSymbols
+
 import { z } from 'zod'
 
 /**

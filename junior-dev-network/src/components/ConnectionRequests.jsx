@@ -1,3 +1,5 @@
+// noinspection JSValidateTypes
+
 /**
  * @fileoverview Componente ConnectionRequests para gestionar solicitudes de conexión pendientes
  * Permite aceptar o rechazar solicitudes de conexión de otros usuarios

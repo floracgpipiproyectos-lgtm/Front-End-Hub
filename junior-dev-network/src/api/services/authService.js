@@ -1,4 +1,6 @@
 // authService.js - VERSIÓN ACTUALIZADA CON SEGURIDAD MEJORADA
+// noinspection JSValidateJSDoc,GrazieInspection
+
 import apiClient from '../apiClient'
 import { AUTH_ENDPOINTS } from '@/constants/apiEndpoints'
 import { STORAGE_KEYS, API_CONFIG } from '@/constants/apiConfig'
@@ -40,13 +42,6 @@ const STORAGE = {
   },
   
   /**
-   * Elimina un token de forma segura
-   */
-  remove: (key) => {
-    secureStorage.removeItem(key)
-  },
-  
-  /**
    * Elimina todos los tokens de autenticación
    */
   clearTokens: () => {
@@ -59,7 +54,7 @@ const STORAGE = {
 // =============================================
 
 /**
- * Valida credenciales antes de enviarlas
+ * Valida las credenciales antes de enviarlas
  * @private
  * @param {UserCredentials} credentials
  * @returns {{isValid: boolean, errors: string[]}}
@@ -123,7 +118,7 @@ const validateRegistrationData = (userData) => {
  * Procesa la respuesta de autenticación con configuración mejorada
  * @private
  * @param {AuthResponse} responseData
- * @returns {AuthResponse}
+ * @returns {{token: *, refreshToken: *, user: *}}
  */
 const handleAuthResponse = (responseData) => {
   const { token, refreshToken, user } = responseData
@@ -259,42 +254,6 @@ export const authService = {
   // OPERACIONES DE RECUPERACIÓN (ACTUALIZADAS)
   // =============================================
   
-  /**
-   * Solicita recuperación de contraseña con validación
-   */
-  forgotPassword: async (email) => {
-    if (!VALIDATION_HELPERS.validateEmail(email)) {
-      throw new Error(VALIDATION_RULES.USER.EMAIL.MESSAGE.INVALID)
-    }
-    
-    const response = await apiClient.post(
-      AUTH_ENDPOINTS.FORGOT_PASSWORD, 
-      { email },
-      { timeout: API_CONFIG.TIMEOUTS.AUTH }
-    )
-    return response.data
-  },
-  
-  /**
-   * Restablece la contraseña con validación de fortaleza
-   */
-  resetPassword: async (resetData) => {
-    if (resetData.newPassword.length < VALIDATION_RULES.USER.PASSWORD.MIN_LENGTH) {
-      throw new Error(VALIDATION_RULES.USER.PASSWORD.MESSAGE.LENGTH)
-    }
-    
-    if (!VALIDATION_HELPERS.validatePassword(resetData.newPassword)) {
-      throw new Error(VALIDATION_RULES.USER.PASSWORD.MESSAGE.COMPLEXITY)
-    }
-    
-    const response = await apiClient.post(
-      AUTH_ENDPOINTS.RESET_PASSWORD, 
-      resetData,
-      { timeout: API_CONFIG.TIMEOUTS.AUTH }
-    )
-    return response.data
-  },
-  
   // =============================================
   // UTILIDADES MEJORADAS
   // =============================================
@@ -343,20 +302,6 @@ export const authService = {
     } catch (error) {
       console.error('Error obteniendo usuario cacheado:', error)
       return null
-    }
-  },
-  
-  /**
-   * Verifica estado de la sesión
-   * @returns {Object} Estado de autenticación
-   */
-  getAuthStatus: () => {
-    return {
-      isAuthenticated: this.isAuthenticated(),
-      hasToken: !!STORAGE.get(TOKEN_KEYS.AUTH),
-      hasRefreshToken: !!STORAGE.get(TOKEN_KEYS.REFRESH),
-      user: this.getCachedUser(),
-      tokenAge: this.getTokenAge()
     }
   },
   

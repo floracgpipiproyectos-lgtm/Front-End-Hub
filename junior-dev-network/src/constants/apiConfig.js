@@ -1,4 +1,5 @@
 // constants/apiConfig.js
+// noinspection GrazieInspection
 
 /**
  * Configuración base de la API
@@ -60,10 +61,7 @@ export const API_CONFIG = {
         },
         MULTIPART: {
             'Content-Type': 'multipart/form-data'
-        },
-        AUTH: (token) => ({
-            'Authorization': `Bearer ${token}`
-        })
+        }
     }
 };
 
@@ -122,12 +120,3 @@ export const LOADING_STATES = {
     UPLOADING: 'uploading'
 };
 
-/**
- * Configuración de paginación
- */
-export const PAGINATION_CONFIG = {
-    DEFAULT_LIMIT: 20,
-    MAX_LIMIT: 100,
-    DEFAULT_PAGE: 1,
-    INFINITE_SCROLL_THRESHOLD: 100 // px antes del final para cargar más
-};

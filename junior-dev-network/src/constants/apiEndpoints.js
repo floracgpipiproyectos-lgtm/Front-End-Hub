@@ -112,11 +112,7 @@ export const PROFILE_ENDPOINTS = {
 // ENDPOINTS DE GITHUB (INTEGRACIÓN EXTERNA)
 // =============================================
 
-export const GITHUB_ENDPOINTS = {
-  GET_ISSUES: '/github/issues',
-  GET_REPOSITORIES: '/github/repositories',
-  SYNC_PROFILE: '/github/sync',
-};
+
 
 // =============================================
 // UTILIDAD PRINCIPAL

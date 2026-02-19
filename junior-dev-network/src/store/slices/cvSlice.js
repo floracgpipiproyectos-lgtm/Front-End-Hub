@@ -1,4 +1,6 @@
 // store/slices/cvSlice.js
+// noinspection UnnecessaryLocalVariableJS,JSValidateTypes
+
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit'
 import { cvService } from '@/api/services'
 import {
@@ -825,6 +827,7 @@ const cacheCVData = (cvId, data) => {
     }
 }
 
+API_CONFIG.CACHE_CONFIG.DEFAULT_TTL = undefined;
 /**
  * Cachea skills en localStorage
  */
@@ -872,23 +875,16 @@ const loadCachedSkills = () => {
 export const selectCVState = (state) => state.cv
 export const selectUpload = (state) => state.cv.upload
 export const selectAnalysis = (state) => state.cv.analysis
-export const selectSuggestions = (state) => state.cv.suggestions
-export const selectStatistics = (state) => state.cv.statistics
 export const selectCVStatus = (state) => state.cv.status
 export const selectCVError = (state) => state.cv.error
 
 // Selectores de entity adapters
 export const {
-    selectAll: selectAllSkills,
-    selectById: selectSkillById,
-    selectIds: selectSkillIds,
-    selectTotal: selectTotalSkills
+    selectAll: selectAllSkills
 } = skillsAdapter.getSelectors((state) => state.cv.skills)
 
 export const {
-    selectAll: selectAllAnalyses,
-    selectById: selectAnalysisById,
-    selectIds: selectAnalysisIds
+    selectAll: selectAllAnalyses
 } = analysesAdapter.getSelectors((state) => state.cv.analyses)
 
 // Selectores derivados
@@ -918,19 +914,10 @@ export const selectTopSkills = (limit = 10) => (state) => {
         .sort((a, b) => (b.confidence || 0) - (a.confidence || 0))
         .slice(0, limit)
 }
-
-export const selectSkillsByCategory = (category) => (state) => {
-    const allSkills = selectAllSkills(state)
-    return allSkills.filter(skill => skill.category === category)
-}
-
 export const selectRecentAnalyses = (limit = 5) => (state) => {
     const allAnalyses = selectAllAnalyses(state)
     return allAnalyses.slice(0, limit)
 }
-
-export const selectAnalysisStatus = (state) => state.cv.analysis.status
-
 export const selectIsAnalyzing = (state) =>
     state.cv.analysis.status === AnalysisStatus.PROCESSING
 
@@ -962,9 +949,6 @@ export const {
     selectSkill,
     addTemporarySkill,
     removeTemporarySkill,
-    filterSkillsByLevel,
-    sortSkillsBy,
-    updateMeta,
     clearCVState
 } = cvSlice.actions
 

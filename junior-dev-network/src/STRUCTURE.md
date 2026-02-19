@@ -128,8 +128,8 @@ Cada feature tiene su propia carpeta con:
 ## 📝 Convenciones de Nomenclatura
 
 ### Archivos
-- **Componentes**: PascalCase (ej: `UserProfile.jsx`)
-- **Hooks**: camelCase con prefijo `use` (ej: `useAuth.js`)
+- **Componentes**: PascalCase (ej.: `UserProfile.jsx`)
+- **Hooks**: camelCase con prefijo `use` (ej.: `useAuth.js`)
 - **Utilidades**: camelCase (ej: `formatDate.js`)
 - **Constantes**: camelCase (ej: `apiEndpoints.js`)
 

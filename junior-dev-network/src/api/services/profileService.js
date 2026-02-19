@@ -1,6 +1,8 @@
 // profileService.js - VERSIÓN ACTUALIZADA
+// noinspection GrazieInspection
+
 import apiClient from '../apiClient'
-import { PROFILE_ENDPOINTS, buildEndpoint } from '@/constants/apiEndpoints'
+import { PROFILE_ENDPOINTS } from '@/constants/apiEndpoints'
 import { API_CONFIG, STORAGE_KEYS, CACHE_CONFIG } from '@/constants/apiConfig'  // NUEVO
 import { VALIDATION_RULES, VALIDATION_HELPERS } from '@/constants/validationRules'  // NUEVO
 import { APP_CONSTANTS } from '@/constants/appConstants'  // NUEVO
@@ -50,9 +52,9 @@ export class ProfileService {
       timeout: API_CONFIG.TIMEOUTS.UPLOAD,
       maxRetryAttempts: API_CONFIG.RETRY_CONFIG.UPLOAD.MAX_ATTEMPTS,
       onUploadProgress: (progressEvent) => {
-        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-        
-        if (onProgress) {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total, 2)
+
+          if (onProgress) {
           onProgress(percent)
         }
         

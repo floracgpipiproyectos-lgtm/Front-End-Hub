@@ -3,8 +3,8 @@ import axios from 'axios'
 import { API_CONFIG, STORAGE_KEYS } from '@/constants/apiConfig'
 import { FEATURE_FLAGS } from '@/constants/featureFlags'
 import { APP_CONSTANTS } from '@/constants/appConstants'
-import { CACHE_CONFIG } from '@/constants/cacheConfig'
 
+// noinspection JSDeprecatedSymbols,JSIgnoredPromiseFromCall
 /**
  * Cliente API avanzado para JuniorDev Network
  * Proporciona funcionalidades como reintentos automáticos, manejo offline,
@@ -153,43 +153,7 @@ class ApiClient {
       return false
     }
   }
-  
-  /**
-   * Realiza una petición HTTP con estrategia de reintentos inteligente
-   * Implementa backoff exponencial con jitter para evitar sobrecarga del servidor
-   * @async
-   * @param {import('axios').AxiosRequestConfig} config - Configuración de la petición Axios
-   * @param {number} [retryAttempt=0] - Número del intento actual (interno)
-   * @returns {Promise<import('axios').AxiosResponse>} Respuesta de la petición exitosa
-   * @throws {Error} Error de la petición después de agotar todos los reintentos
-   */
-  async requestWithRetry(config, retryAttempt = 0) {
-    const maxAttempts = config.maxRetryAttempts || API_CONFIG.RETRY_CONFIG.DEFAULT.MAX_ATTEMPTS
-    const baseDelay = config.retryDelay || API_CONFIG.RETRY_CONFIG.DEFAULT.BASE_DELAY
-    
-    try {
-      return await this.instance(config)
-    } catch (error) {
-      if (retryAttempt >= maxAttempts) {
-        throw error
-      }
-      
-      // Solo reintentar en ciertos errores
-      if (!API_CONFIG.RETRY_CONFIG.DEFAULT.RETRY_ON_STATUS.includes(error.response?.status)) {
-        throw error
-      }
-      
-      // Backoff exponencial con jitter
-      const delay = baseDelay * Math.pow(2, retryAttempt) + Math.random() * 1000
-      
-      console.log(`🔄 Reintentando en ${delay}ms (intento ${retryAttempt + 1}/${maxAttempts})`)
-      
-      await new Promise(resolve => setTimeout(resolve, delay))
-      
-      return this.requestWithRetry(config, retryAttempt + 1)
-    }
-  }
-  
+
   // =============================================
   // MANEJO OFFLINE
   // =============================================

@@ -1,4 +1,5 @@
 // constants/validationRules.js
+// noinspection JSCheckFunctionSignatures
 
 /**
  * Reglas de validación para formularios y datos

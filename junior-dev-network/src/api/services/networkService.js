@@ -1,4 +1,6 @@
 // networkService.js
+// noinspection GrazieInspection,UnnecessaryLocalVariableJS
+
 import apiClient from '../apiClient'
 import { NETWORK_ENDPOINTS, buildEndpoint } from '@/constants/apiEndpoints'
 
@@ -168,68 +170,9 @@ export const CommunityType = {
 // HELPERS INTERNOS
 // =============================================
 
-/**
- * Filtra mentores por criterios
- * @private
- * @param {Mentor[]} mentors - Array de mentores
- * @param {Object} criteria - Criterios de filtrado
- * @returns {Mentor[]} Mentores filtrados
- */
-const filterMentors = (mentors, criteria) => {
-  return mentors.filter(mentor => {
-    // Filtrar por skills si están especificadas
-    if (criteria.skills && criteria.skills.length > 0) {
-      const hasAnySkill = criteria.skills.some(skill => 
-        mentor.skills.includes(skill)
-      )
-      if (!hasAnySkill) return false
-    }
-    
-    // Filtrar por ubicación
-    if (criteria.location && !mentor.location.includes(criteria.location)) {
-      return false
-    }
-    
-    // Filtrar por disponibilidad
-    if (criteria.availableOnly && mentor.availability !== MentorAvailability.AVAILABLE) {
-      return false
-    }
-    
-    // Filtrar por rating mínimo
-    if (criteria.minRating && mentor.rating < criteria.minRating) {
-      return false
-    }
-    
-    // Filtrar por experiencia mínima
-    if (criteria.minExperience && mentor.yearsOfExperience < criteria.minExperience) {
-      return false
-    }
-    
-    return true
-  })
-}
 
-/**
- * Ordena mentores por criterio
- * @private
- * @param {Mentor[]} mentors - Array de mentores
- * @param {string} [sortBy='rating'] - Campo para ordenar
- * @returns {Mentor[]} Mentores ordenados
- */
-const sortMentors = (mentors, sortBy = 'rating') => {
-  return [...mentors].sort((a, b) => {
-    switch (sortBy) {
-      case 'rating':
-        return b.rating - a.rating
-      case 'experience':
-        return b.yearsOfExperience - a.yearsOfExperience
-      case 'mentees':
-        return b.menteesCount - a.menteesCount
-      default:
-        return b.rating - a.rating
-    }
-  })
-}
+
+
 
 // =============================================
 // SERVICIO DE NETWORKING
@@ -443,7 +386,7 @@ export const networkService = {
       networkService.getCommunities(),
       networkService.getUserCommunities()
     ])
-    
+
     // Filtrar comunidades a las que no pertenece
     const userCommunityIds = new Set(userCommunities.map(c => c.id))
     const availableCommunities = allCommunities.filter(
@@ -592,10 +535,9 @@ export const networkService = {
   
   /**
    * Obtiene sugerencias de conexión
-   * @param {number} [limit=10] - Límite de sugerencias
    * @returns {Promise<string[]>} IDs de usuarios sugeridos
    */
-  getConnectionSuggestions: async (limit = 10) => {
+  getConnectionSuggestions: async () => {
     // En una implementación real, esto llamaría a un endpoint específico
     return Promise.resolve([])
   },
@@ -733,10 +675,9 @@ export const networkService = {
   
   /**
    * Marca mensajes como leídos
-   * @param {string} conversationId - ID de la conversación
    * @returns {Promise<{success: boolean}>} Confirmación
    */
-  markMessagesAsRead: async (conversationId) => {
+  markMessagesAsRead: async () => {
     // En una implementación real, esto llamaría a un endpoint específico
     return Promise.resolve({ success: true })
   },
@@ -765,10 +706,9 @@ export const networkService = {
   
   /**
    * Obtiene red de contactos expandida
-   * @param {number} [depth=2] - Profundidad de búsqueda
    * @returns {Promise<string[]>} IDs de usuarios en la red expandida
    */
-  getExpandedNetwork: async (depth = 2) => {
+  getExpandedNetwork: async () => {
     // En una implementación real, esto llamaría al backend
     const connections = await networkService.getActiveConnections()
     return connections.map(conn => conn.userId)
@@ -776,13 +716,11 @@ export const networkService = {
   
   /**
    * Encuentra usuarios con skills similares
-   * @param {string[]} userSkills - Skills del usuario
-   * @param {number} [limit=10] - Límite de resultados
    * @returns {Promise<string[]>} IDs de usuarios con skills similares
    */
-  findUsersWithSimilarSkills: async (userSkills, limit = 10) => {
+  findUsersWithSimilarSkills: async () => {
     // En una implementación real, esto usaría un algoritmo de matching
-    return networkService.getConnectionSuggestions(limit)
+    return networkService.getConnectionSuggestions()
   },
   
   /**
@@ -801,7 +739,7 @@ export const networkService = {
       networkService.getUserCommunities(),
       networkService.getSentMentorRequests()
     ])
-    
+
     return {
       networkSize: connectionStats.total,
       activeConnections: connectionStats.accepted,

@@ -100,6 +100,7 @@ export const useGamification = () => {
     // Acciones asíncronas
     const loadBadges = useCallback(async () => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const badges = await dispatch(fetchBadges()).unwrap()
             return badges
         } catch (err) {
@@ -110,6 +111,7 @@ export const useGamification = () => {
 
     const loadUserBadges = useCallback(async () => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const userBadges = await dispatch(fetchUserBadges()).unwrap()
             return userBadges
         } catch (err) {
@@ -120,6 +122,7 @@ export const useGamification = () => {
 
     const claimUserBadge = useCallback(async (badgeId) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const badge = await dispatch(claimBadge(badgeId)).unwrap()
             return badge
         } catch (err) {
@@ -130,6 +133,7 @@ export const useGamification = () => {
 
     const loadProgress = useCallback(async () => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const progressData = await dispatch(fetchProgress()).unwrap()
             return progressData
         } catch (err) {
@@ -140,6 +144,7 @@ export const useGamification = () => {
 
     const addUserXP = useCallback(async (xp, source = 'general') => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const result = await dispatch(addXP({ xp, source })).unwrap()
             return result
         } catch (err) {
@@ -150,6 +155,7 @@ export const useGamification = () => {
 
     const loadLeaderboard = useCallback(async (options = {}) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const leaderboard = await dispatch(fetchLeaderboard(options)).unwrap()
             return leaderboard
         } catch (err) {
@@ -160,6 +166,7 @@ export const useGamification = () => {
 
     const loadOverallLeaderboard = useCallback(async (limit = 50) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const leaderboard = await dispatch(fetchOverallLeaderboard(limit)).unwrap()
             return leaderboard
         } catch (err) {
@@ -170,6 +177,7 @@ export const useGamification = () => {
 
     const loadWeeklyLeaderboard = useCallback(async (limit = 30) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const leaderboard = await dispatch(fetchWeeklyLeaderboard(limit)).unwrap()
             return leaderboard
         } catch (err) {
@@ -180,6 +188,7 @@ export const useGamification = () => {
 
     const loadUserRank = useCallback(async (type) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const rank = await dispatch(fetchUserRank(type)).unwrap()
             return rank
         } catch (err) {
@@ -190,6 +199,7 @@ export const useGamification = () => {
 
     const loadGoals = useCallback(async () => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const goals = await dispatch(fetchCurrentGoals()).unwrap()
             return goals
         } catch (err) {
@@ -200,6 +210,7 @@ export const useGamification = () => {
 
     const updateGoal = useCallback(async (achievementId, increment = 1) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const result = await dispatch(updateGoalProgress({ achievementId, increment })).unwrap()
             return result
         } catch (err) {
@@ -210,6 +221,7 @@ export const useGamification = () => {
 
     const loadActivityStats = useCallback(async () => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const stats = await dispatch(fetchActivityStats()).unwrap()
             return stats
         } catch (err) {
@@ -220,6 +232,7 @@ export const useGamification = () => {
 
     const loadInsights = useCallback(async () => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const insightsData = await dispatch(fetchGamificationInsights()).unwrap()
             return insightsData
         } catch (err) {
@@ -230,6 +243,7 @@ export const useGamification = () => {
 
     const loadNewBadges = useCallback(async () => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const newBadgesData = await dispatch(fetchNewBadges()).unwrap()
             return newBadgesData
         } catch (err) {
@@ -240,6 +254,7 @@ export const useGamification = () => {
 
     const markBadgesSeen = useCallback(async (badgeIds) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const result = await dispatch(markBadgesAsSeen(badgeIds)).unwrap()
             return result
         } catch (err) {
@@ -474,7 +489,7 @@ export const useGamification = () => {
  * Hook para manejar recompensas por actividades
  */
 export const useRewards = () => {
-    const { addUserXP, claimUserBadge, logXP, sendNotification } = useGamification()
+    const { addUserXP, logXP, sendNotification } = useGamification()
 
     const rewardProjectCompletion = useCallback(async (projectDifficulty = 1) => {
         const xp = 100 * projectDifficulty

@@ -1,17 +1,16 @@
 // store/slices/networkSlice.js
+// noinspection UnnecessaryLocalVariableJS,JSValidateTypes
+
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit'
 import { networkService } from '@/api/services'
 import {
-    API_CONFIG,
     STORAGE_KEYS,
     LOADING_STATES,
     CACHE_CONFIG
 } from '@/constants/apiConfig'
 import {
     ConnectionStatus,
-    MentorAvailability,
-    MessageStatus,
-    CommunityType
+    MentorAvailability
 } from '@/api/services/networkService'
 
 // =============================================
@@ -225,7 +224,7 @@ export const sendConnectionRequest = createAsyncThunk(
             const connection = await networkService.sendConnectionRequest(connectionData)
 
             // Refrescar conexiones
-            dispatch(fetchConnections())
+            dispatch(fetchConnections({}, undefined))
 
             return connection
         } catch (error) {
@@ -244,20 +243,21 @@ export const acceptConnection = createAsyncThunk(
     'network/acceptConnection',
     async (connectionId, { rejectWithValue, dispatch }) => {
         try {
-            const result = await networkService.acceptConnection(connectionId)
+            const result = await networkService.acceptConnection(connectionId);
 
             // Refrescar conexiones
-            dispatch(fetchConnections())
+            dispatch(fetchConnections({}, undefined));
 
-            return { connectionId, ...result }
+            return { connectionId, ...result };
         } catch (error) {
             return rejectWithValue({
                 message: error.message,
                 code: error.response?.status
-            })
+            });
         }
     }
-)
+);
+
 
 /**
  * Rechaza solicitud de conexión
@@ -269,7 +269,7 @@ export const rejectConnection = createAsyncThunk(
             const result = await networkService.rejectConnection(connectionId)
 
             // Refrescar conexiones
-            dispatch(fetchConnections())
+            dispatch(fetchConnections({}, undefined))
 
             return { connectionId, ...result }
         } catch (error) {
@@ -351,7 +351,7 @@ export const markMessagesAsRead = createAsyncThunk(
     'network/markMessagesAsRead',
     async (conversationId, { rejectWithValue, dispatch }) => {
         try {
-            const result = await networkService.markMessagesAsRead(conversationId)
+            const result = await networkService.markMessagesAsRead()
 
             // Refrescar conversaciones para actualizar conteo de no leídos
             dispatch(fetchConversations())
@@ -445,7 +445,7 @@ export const fetchConnectionSuggestions = createAsyncThunk(
     'network/fetchConnectionSuggestions',
     async (limit = 10, { rejectWithValue }) => {
         try {
-            const suggestions = await networkService.getConnectionSuggestions(limit)
+            const suggestions = await networkService.getConnectionSuggestions()
             return suggestions
         } catch (error) {
             return rejectWithValue({
@@ -553,255 +553,6 @@ const networkSlice = createSlice({
         // =============================================
         // REDUCERS SÍNCRONOS
         // =============================================
-
-        /**
-         * Establece mentor actual
-         */
-        setCurrentMentor: (state, action) => {
-            state.currentMentor = action.payload
-        },
-
-        /**
-         * Establece filtros de mentores
-         */
-        setMentorFilters: (state, action) => {
-            state.mentorFilters = action.payload
-        },
-
-        /**
-         * Establece filtros de comunidades
-         */
-        setCommunityFilters: (state, action) => {
-            state.communityFilters = action.payload
-        },
-
-        /**
-         * Establece filtros de conexiones
-         */
-        setConnectionFilters: (state, action) => {
-            state.connectionFilters = action.payload
-        },
-
-        /**
-         * Establece filtros de mensajes
-         */
-        setMessageFilters: (state, action) => {
-            state.messageFilters = action.payload
-        },
-
-        /**
-         * Establece conversación actual
-         */
-        setCurrentConversation: (state, action) => {
-            const conversationId = action.payload
-            state.currentConversationId = conversationId
-
-            // Marcar mensajes como leídos cuando se abre la conversación
-            if (conversationId) {
-                const conversation = state.conversations.entities[conversationId]
-                if (conversation && conversation.unreadCount > 0) {
-                    conversation.unreadCount = 0
-                }
-            }
-        },
-
-        /**
-         * Agrega mensaje en tiempo real (para WebSockets)
-         */
-        addRealtimeMessage: (state, action) => {
-            const message = action.payload
-            messagesAdapter.addOne(state.messages, message)
-
-            // Actualizar conversación relacionada
-            if (message.conversationId) {
-                const conversation = state.conversations.entities[message.conversationId]
-                if (conversation) {
-                    conversation.lastMessage = message
-                    conversation.lastActivityAt = message.sentAt
-                    
-                    // Incrementar no leídos si no es el usuario actual
-                    if (message.senderId !== state.meta.currentUserId) {
-                        conversation.unreadCount = (conversation.unreadCount || 0) + 1
-                    }
-                }
-            }
-        },
-
-        /**
-         * Marca mensaje como leído localmente
-         */
-        markMessageAsRead: (state, action) => {
-            const messageId = action.payload
-            const message = state.messages.entities[messageId]
-            
-            if (message && message.status !== MessageStatus.READ) {
-                message.status = MessageStatus.READ
-                message.readAt = new Date().toISOString()
-            }
-        },
-
-        /**
-         * Agrega conexión pendiente localmente
-         */
-        addPendingConnection: (state, action) => {
-            const connection = {
-                ...action.payload,
-                id: `temp_${Date.now()}`,
-                status: ConnectionStatus.PENDING,
-                requestedAt: new Date().toISOString(),
-                isTemporary: true
-            }
-            connectionsAdapter.addOne(state.connections, connection)
-        },
-
-        /**
-         * Elimina conexión temporal
-         */
-        removeTemporaryConnection: (state, action) => {
-            const connectionId = action.payload
-            const connection = state.connections.entities[connectionId]
-            
-            if (connection && connection.isTemporary) {
-                connectionsAdapter.removeOne(state.connections, connectionId)
-            }
-        },
-
-        /**
-         * Actualiza estado de conexión
-         */
-        updateConnectionStatus: (state, action) => {
-            const { connectionId, status } = action.payload
-            const connection = state.connections.entities[connectionId]
-            
-            if (connection) {
-                connection.status = status
-                connection.respondedAt = new Date().toISOString()
-                
-                // Si es aceptada, actualizar estadísticas
-                if (status === ConnectionStatus.ACCEPTED) {
-                    state.meta.totalConnections += 1
-                }
-            }
-        },
-
-        /**
-         * Filtra mentores por skill
-         */
-        filterMentorsBySkill: (state, action) => {
-            const skill = action.payload
-            state.mentorFilters.skills = state.mentorFilters.skills || []
-            
-            if (!state.mentorFilters.skills.includes(skill)) {
-                state.mentorFilters.skills.push(skill)
-            }
-        },
-
-        /**
-         * Limpia filtros de mentores
-         */
-        clearMentorFilters: (state) => {
-            state.mentorFilters = {}
-        },
-
-        /**
-         * Ordena mentores por criterio
-         */
-        sortMentorsBy: (state, action) => {
-            const { field, direction = 'desc' } = action.payload
-            state.mentors.sort = { field, direction }
-        },
-
-        /**
-         * Ordena comunidades por criterio
-         */
-        sortCommunitiesBy: (state, action) => {
-            const { field, direction = 'desc' } = action.payload
-            state.communities.sort = { field, direction }
-        },
-
-        /**
-         * Ordena conexiones por criterio
-         */
-        sortConnectionsBy: (state, action) => {
-            const { field, direction = 'desc' } = action.payload
-            state.connections.sort = { field, direction }
-        },
-
-        /**
-         * Limpia errores de networking
-         */
-        clearNetworkError: (state) => {
-            state.error = null
-            state.mentorsError = null
-            state.communitiesError = null
-            state.connectionsError = null
-            state.messagesError = null
-            state.conversationsError = null
-            state.mentorRequestsError = null
-            state.statsError = null
-            state.status = LOADING_STATES.IDLE
-        },
-
-        /**
-         * Limpia mensajes de conversación actual
-         */
-        clearCurrentConversation: (state) => {
-            state.currentConversationId = null
-            state.messageFilters = {}
-        },
-
-        /**
-         * Resetea estado de networking
-         */
-        resetNetworkState: () => {
-            return initialState
-        },
-
-        /**
-         * Simula evento de networking (para desarrollo)
-         */
-        simulateNetworkEvent: (state, action) => {
-            const { type, data } = action.payload
-
-            switch (type) {
-                case 'new_connection':
-                    const newConnection = {
-                        id: `conn_sim_${Date.now()}`,
-                        userId: data.userId || 'user_sim',
-                        userAlias: data.userAlias || 'Usuario Simulado',
-                        userAvatarUrl: data.avatarUrl || '/avatars/default.png',
-                        commonSkills: data.skills || [],
-                        status: ConnectionStatus.PENDING,
-                        message: data.message || 'Me gustaría conectarme',
-                        requestedAt: new Date().toISOString(),
-                        interactionScore: 0
-                    }
-                    connectionsAdapter.addOne(state.connections, newConnection)
-                    break
-
-                case 'new_message':
-                    const newMessage = {
-                        id: `msg_sim_${Date.now()}`,
-                        conversationId: data.conversationId || 'conv_sim',
-                        senderId: data.senderId || 'user_sim',
-                        recipientId: data.recipientId || state.meta.currentUserId,
-                        content: data.content || 'Hola, ¿cómo estás?',
-                        status: MessageStatus.SENT,
-                        sentAt: new Date().toISOString(),
-                        isEdited: false,
-                        attachments: []
-                    }
-                    messagesAdapter.addOne(state.messages, newMessage)
-                    break
-
-                case 'mentor_available':
-                    const mentor = state.mentors.entities[data.mentorId]
-                    if (mentor) {
-                        mentor.availability = MentorAvailability.AVAILABLE
-                    }
-                    break
-            }
-        }
     },
     extraReducers: (builder) => {
         // =============================================
@@ -1194,18 +945,13 @@ const calculateConnectionStats = (connections) => {
 
 // Selectores básicos
 export const selectNetworkState = (state) => state.network
-export const selectMentorsState = (state) => state.network.mentors
 export const selectCurrentMentor = (state) => state.network.currentMentor
 export const selectMentorFilters = (state) => state.network.mentorFilters
-export const selectCommunitiesState = (state) => state.network.communities
 export const selectUserCommunities = (state) => state.network.userCommunities
 export const selectCommunityFilters = (state) => state.network.communityFilters
-export const selectConnectionsState = (state) => state.network.connections
 export const selectConnectionFilters = (state) => state.network.connectionFilters
-export const selectMessagesState = (state) => state.network.messages
 export const selectMessageFilters = (state) => state.network.messageFilters
 export const selectCurrentConversationId = (state) => state.network.currentConversationId
-export const selectConversationsState = (state) => state.network.conversations
 export const selectSentMentorRequests = (state) => state.network.sentMentorRequests
 export const selectReceivedMentorRequests = (state) => state.network.receivedMentorRequests
 export const selectNetworkStats = (state) => state.network.networkStats
@@ -1217,38 +963,24 @@ export const selectNetworkError = (state) => state.network.error
 
 // Selectores de entity adapters
 export const {
-    selectAll: selectAllMentors,
-    selectById: selectMentorById,
-    selectIds: selectMentorIds,
-    selectTotal: selectTotalMentors
+    selectAll: selectAllMentors
 } = mentorsAdapter.getSelectors((state) => state.network.mentors)
 
 export const {
-    selectAll: selectAllCommunities,
-    selectById: selectCommunityById,
-    selectIds: selectCommunityIds,
-    selectTotal: selectTotalCommunities
+    selectAll: selectAllCommunities
 } = communitiesAdapter.getSelectors((state) => state.network.communities)
 
 export const {
-    selectAll: selectAllConnections,
-    selectById: selectConnectionById,
-    selectIds: selectConnectionIds,
-    selectTotal: selectTotalConnections
+    selectAll: selectAllConnections
 } = connectionsAdapter.getSelectors((state) => state.network.connections)
 
 export const {
-    selectAll: selectAllMessages,
-    selectById: selectMessageById,
-    selectIds: selectMessageIds,
-    selectTotal: selectTotalMessages
+    selectAll: selectAllMessages
 } = messagesAdapter.getSelectors((state) => state.network.messages)
 
 export const {
     selectAll: selectAllConversations,
-    selectById: selectConversationById,
-    selectIds: selectConversationIds,
-    selectTotal: selectTotalConversations
+    selectById: selectConversationById
 } = conversationsAdapter.getSelectors((state) => state.network.conversations)
 
 // Selectores derivados
@@ -1285,16 +1017,6 @@ export const selectUserCommunityIds = (state) => {
     const userCommunities = selectUserCommunities(state)
     return userCommunities.map(community => community.id)
 }
-
-export const selectNonUserCommunities = (state) => {
-    const allCommunities = selectAllCommunities(state)
-    const userCommunityIds = new Set(selectUserCommunityIds(state))
-    
-    return allCommunities.filter(community => 
-        !userCommunityIds.has(community.id)
-    )
-}
-
 export const selectConnectionsByStatus = (status) => (state) => {
     const allConnections = selectAllConnections(state)
     return allConnections.filter(connection => connection.status === status)

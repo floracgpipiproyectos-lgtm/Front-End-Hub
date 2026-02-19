@@ -1,4 +1,6 @@
 // projectService.js
+// noinspection GrazieInspection
+
 import apiClient from '../apiClient'
 import { PROJECT_ENDPOINTS, buildEndpoint } from '@/constants/apiEndpoints'
 
@@ -134,6 +136,7 @@ export const ProjectStatus = {
  * @property {number} estimated_completion_time - Tiempo estimado en horas
  */
 
+// noinspection GrazieInspection
 /**
  * Servicio de gestión de proyectos
  * Maneja la obtención, búsqueda y gestión de proyectos

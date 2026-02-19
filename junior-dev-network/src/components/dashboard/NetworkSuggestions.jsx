@@ -1,3 +1,5 @@
+// noinspection JSValidateTypes
+
 /**
  * NetworkSuggestions - Muestra sugerencias de conexiones y comunidades
  */
@@ -11,7 +13,7 @@ import Card from '../common/Card'
  * Componente para sugerencias de red
  * @component
  * @param {Array<Object>} suggestions - Array de desarrolladores sugeridos
- * @returns {JSX.Element}
+ * @returns {React.JSX.Element}
  */
 export default function NetworkSuggestions({ suggestions = [] }) {
   const [connected, setConnected] = useState({})

@@ -33,10 +33,6 @@ import {
     selectAllSkills,
     selectCVSkills,
     selectManualSkills,
-    selectSkillByName,
-    selectTopSkills,
-    selectSkillsByLevel,
-    selectRecentAnalyses,
     selectIsAnalyzing,
     selectHasCompletedAnalysis,
     selectDeveloperLevel,
@@ -72,6 +68,7 @@ export const useCV = () => {
     // Acciones
     const uploadCVFile = useCallback(async (file, onProgress) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const result = await dispatch(uploadCV({ file, onProgress })).unwrap()
             return result
         } catch (error) {
@@ -82,6 +79,7 @@ export const useCV = () => {
 
     const analyzeCVFile = useCallback(async (cvId) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const result = await dispatch(analyzeCV(cvId)).unwrap()
             return result
         } catch (error) {
@@ -92,6 +90,7 @@ export const useCV = () => {
 
     const getCVAnalysis = useCallback(async (analysisId) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const result = await dispatch(getAnalysis(analysisId)).unwrap()
             return result
         } catch (error) {
@@ -102,6 +101,7 @@ export const useCV = () => {
 
     const waitForCVAnalysis = useCallback(async (analysisId, timeoutMs = 30000, pollInterval = 1000) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const result = await dispatch(waitForAnalysis({
                 analysisId,
                 timeoutMs,
@@ -116,6 +116,7 @@ export const useCV = () => {
 
     const loadSkills = useCallback(async () => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const skills = await dispatch(fetchSkills()).unwrap()
             return skills
         } catch (error) {
@@ -126,6 +127,7 @@ export const useCV = () => {
 
     const saveSkills = useCallback(async (skills) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const result = await dispatch(updateSkills(skills)).unwrap()
             return result
         } catch (error) {
@@ -136,6 +138,7 @@ export const useCV = () => {
 
     const addNewSkill = useCallback(async (name, level) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const newSkill = await dispatch(addSkill({ name, level })).unwrap()
             return newSkill
         } catch (error) {
@@ -146,6 +149,7 @@ export const useCV = () => {
 
     const changeSkillLevel = useCallback(async (skillName, newLevel) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const updatedSkill = await dispatch(updateSkillLevel({ skillName, newLevel })).unwrap()
             return updatedSkill
         } catch (error) {
@@ -156,6 +160,7 @@ export const useCV = () => {
 
     const deleteSkill = useCallback(async (skillName) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const result = await dispatch(removeSkill(skillName)).unwrap()
             return result
         } catch (error) {
@@ -166,6 +171,7 @@ export const useCV = () => {
 
     const loadSuggestions = useCallback(async (options) => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const suggestions = await dispatch(fetchSuggestions(options)).unwrap()
             return suggestions
         } catch (error) {
@@ -176,6 +182,7 @@ export const useCV = () => {
 
     const loadStatistics = useCallback(async () => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const stats = await dispatch(fetchSkillStatistics()).unwrap()
             return stats
         } catch (error) {
@@ -186,6 +193,7 @@ export const useCV = () => {
 
     const calculateLevel = useCallback(async () => {
         try {
+            // noinspection UnnecessaryLocalVariableJS
             const level = await dispatch(calculateDeveloperLevel()).unwrap()
             return level
         } catch (error) {
@@ -244,6 +252,7 @@ export const useCV = () => {
 
     // Valores memoizados
     const skillCounts = useMemo(() => {
+        // noinspection UnnecessaryLocalVariableJS
         const counts = {
             total: allSkills.length,
             cv: cvSkills.length,

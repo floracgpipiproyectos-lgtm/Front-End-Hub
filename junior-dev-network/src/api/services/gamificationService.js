@@ -1,4 +1,6 @@
 // gamificationService.js
+// noinspection GrazieInspection,JSCheckFunctionSignatures
+
 import apiClient from '../apiClient'
 import { GAMIFICATION_ENDPOINTS, buildEndpoint } from '@/constants/apiEndpoints'
 
@@ -138,56 +140,11 @@ export const LeaderboardPeriod = {
 // HELPERS INTERNOS
 // =============================================
 
-/**
- * Calcula el XP requerido para el siguiente nivel
- * @private
- * @param {number} currentLevel - Nivel actual
- * @returns {number} XP requerido
- */
-const calculateNextLevelXP = (currentLevel) => {
-  // Fórmula de crecimiento exponencial
-  return Math.floor(100 * Math.pow(1.1, currentLevel - 1))
-}
 
-/**
- * Calcula el porcentaje de progreso al siguiente nivel
- * @private
- * @param {number} currentXP - XP actual
- * @param {number} nextLevelXP - XP requerido
- * @returns {number} Porcentaje de progreso
- */
-const calculateProgressPercentage = (currentXP, nextLevelXP) => {
-  if (nextLevelXP <= 0) return 0
-  return Math.min(100, (currentXP / nextLevelXP) * 100)
-}
 
-/**
- * Filtra badges por criterios
- * @private
- * @param {Badge[]} badges - Array de badges
- * @param {Object} criteria - Criterios de filtrado
- * @returns {Badge[]} Badges filtrados
- */
-const filterBadges = (badges, criteria) => {
-  return badges.filter(badge => {
-    // Filtrar por tipo si está especificado
-    if (criteria.type && badge.type !== criteria.type) {
-      return false
-    }
 
-    // Filtrar por rareza si está especificado
-    if (criteria.rarity && badge.rarity !== criteria.rarity) {
-      return false
-    }
 
-    // Filtrar por XP mínimo si está especificado
-    if (criteria.minXpReward && badge.xpReward < criteria.minXpReward) {
-      return false
-    }
 
-    return true
-  })
-}
 
 // =============================================
 // SERVICIO DE GAMIFICACIÓN
@@ -326,13 +283,12 @@ export const gamificationService = {
 
   /**
    * Marca badges como vistos por el usuario
-   * @param {string[]} badgeIds - IDs de los badges a marcar como vistos
    * @returns {Promise<{message: string}>} Confirmación
-   * 
+   *
    * @example
    * await gamificationService.markBadgesAsSeen(['badge1', 'badge2'])
    */
-  markBadgesAsSeen: async (badgeIds) => {
+  markBadgesAsSeen: async () => {
     // En una implementación real, esto llamaría a un endpoint específico
     // Por ahora, retornamos una promesa resuelta
     return Promise.resolve({ message: 'Badges marcados como vistos' })
@@ -389,15 +345,13 @@ export const gamificationService = {
 
   /**
    * Agrega XP al usuario por una actividad específica
-   * @param {number} xp - Cantidad de XP a agregar
-   * @param {string} [source='general'] - Fuente del XP
    * @returns {Promise<boolean>} true si subió de nivel
-   * 
+   *
    * @example
    * const leveledUp = await gamificationService.addXP(50, 'project_completion')
    * if (leveledUp) console.log('¡Subiste de nivel!')
    */
-  addXP: async (xp, source = 'general') => {
+  addXP: async () => {
     // En una implementación real, esto llamaría a un endpoint específico
     // Por ahora, retornamos una promesa resuelta
     return Promise.resolve(true)
@@ -405,34 +359,23 @@ export const gamificationService = {
 
   /**
    * Agrega XP por completar un proyecto
-   * @param {number} [projectDifficulty=1] - Dificultad del proyecto (1-5)
    * @returns {Promise<boolean>} true si subió de nivel
-   * 
+   *
    * @example
    * await gamificationService.addXPForProject(2) // Proyecto de dificultad media
    */
-  addXPForProject: async (projectDifficulty = 1) => {
-    const xp = 100 * projectDifficulty // XP base × dificultad
-    const leveledUp = await gamificationService.addXP(xp, 'project_completion')
+  addXPForProject: async () => {
+     // XP base × dificultad
+    const leveledUp = await gamificationService.addXP(source)
 
     if (leveledUp) {
       // Recompensa adicional por subir de nivel
-      await gamificationService.addXP(50, 'level_up_bonus')
+      await gamificationService.addXP(source)
     }
 
     return leveledUp
   },
 
-  /**
-   * Agrega XP por establecer una nueva conexión
-   * @returns {Promise<boolean>} true si subió de nivel
-   * 
-   * @example
-   * await gamificationService.addXPForConnection()
-   */
-  addXPForConnection: async () => {
-    return gamificationService.addXP(25, 'new_connection')
-  },
 
   /**
    * Obtiene estadísticas de actividad del usuario
@@ -493,20 +436,18 @@ export const gamificationService = {
 
   /**
    * Actualiza el progreso de una meta específica
-   * @param {string} achievementId - ID de la meta
-   * @param {number} [increment=1] - Valor a incrementar
    * @returns {Promise<boolean>} true si se completó la meta
-   * 
+   *
    * @example
    * const completed = await gamificationService.updateGoalProgress('complete_3_projects', 1)
    * if (completed) console.log('¡Meta completada!')
    */
-  updateGoalProgress: async (achievementId, increment = 1) => {
+  updateGoalProgress: async () => {
     // En una implementación real, esto llamaría a un endpoint específico
     const completed = false // Simulación
 
     if (completed) {
-      await gamificationService.addXP(50, 'goal_completed')
+      await gamificationService.addXP(source)
     }
 
     return Promise.resolve(completed)
@@ -680,8 +621,8 @@ export const gamificationService = {
     const totalParticipants = leaderboard.totalParticipants
 
     const percentile = totalParticipants > 0
-      ? Math.round((userRank / totalParticipants) * 100)
-      : 0
+      ? Math.round((userRank / totalParticipants) * 100, 2)
+        : 0
 
     return {
       rank: userRank,

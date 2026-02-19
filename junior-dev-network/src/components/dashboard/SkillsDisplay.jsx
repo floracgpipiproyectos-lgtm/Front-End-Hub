@@ -8,7 +8,7 @@ import { FiX } from 'react-icons/fi'
  * @component
  * @param {Array<string>} skills - Array de habilidades a mostrar
  * @param {Function} onRemove - Callback cuando se elimina una habilidad
- * @returns {JSX.Element}
+ * @returns {React.JSX.Element}
  */
 export default function SkillsDisplay({ skills = [], onRemove = null }) {
   if (!skills || skills.length === 0) {

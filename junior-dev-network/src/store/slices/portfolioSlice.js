@@ -1,18 +1,17 @@
 // store/slices/portfolioSlice.js
+// noinspection DuplicatedCode,UnnecessaryLocalVariableJS,JSValidateTypes,JSCheckFunctionSignatures
+
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit'
 import { portfolioService } from '@/api/services'
 import {
-    API_CONFIG,
     STORAGE_KEYS,
     LOADING_STATES,
     CACHE_CONFIG
 } from '@/constants/apiConfig'
-import { VALIDATION_RULES, VALIDATION_HELPERS } from '@/constants/validationRules'
+import { VALIDATION_RULES } from '@/constants/validationRules'
 import { 
     ProjectStatus,
-    ProjectVisibility,
-    ContentType,
-    LinkType 
+    ProjectVisibility
 } from '@/api/services/portfolioService'
 
 // =============================================
@@ -1314,7 +1313,7 @@ const portfolioSlice = createSlice({
                 state.upload.currentType = type
                 state.upload.error = null
             })
-            .addCase(uploadPortfolioImage.fulfilled, (state, action) => {
+            .addCase(uploadPortfolioImage.fulfilled, (state) => {
                 state.upload.isUploading = false
                 state.upload.progress = 100
                 state.upload.currentType = null
@@ -1331,7 +1330,7 @@ const portfolioSlice = createSlice({
             .addCase(publishPortfolio.pending, (state) => {
                 state.settingsStatus = LOADING_STATES.LOADING
             })
-            .addCase(publishPortfolio.fulfilled, (state, action) => {
+            .addCase(publishPortfolio.fulfilled, (state) => {
                 state.settings.isPublished = true
                 state.settings.publishedAt = new Date().toISOString()
                 state.settings.lastPublished = new Date().toISOString()

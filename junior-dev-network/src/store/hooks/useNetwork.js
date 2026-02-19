@@ -1,4 +1,6 @@
 // store/hooks/useNetwork.js
+// noinspection UnnecessaryLocalVariableJS,GrazieInspection
+
 import { useSelector, useDispatch } from 'react-redux'
 import { useCallback, useMemo } from 'react'
 import {
@@ -6,47 +8,12 @@ import {
     fetchMentors,
     fetchMentorById,
     requestMentorship,
-    fetchRecommendedMentors,
-    fetchCommunities,
-    joinCommunity,
-    fetchUserCommunities,
-    fetchConnections,
-    sendConnectionRequest,
-    acceptConnection,
-    rejectConnection,
-    fetchMessages,
-    sendMessage,
-    fetchConversations,
-    markMessagesAsRead,
-    fetchNetworkStats,
-    fetchNetworkingInsights,
-    fetchSentMentorRequests,
-    fetchReceivedMentorRequests,
-    fetchConnectionSuggestions,
-    fetchFeaturedUsers,
-
     // Acciones síncronas
     setCurrentMentor,
     setMentorFilters,
     setCommunityFilters,
-    setConnectionFilters,
-    setMessageFilters,
     setCurrentConversation,
     addRealtimeMessage,
-    markMessageAsRead,
-    addPendingConnection,
-    removeTemporaryConnection,
-    updateConnectionStatus,
-    filterMentorsBySkill,
-    clearMentorFilters,
-    sortMentorsBy,
-    sortCommunitiesBy,
-    sortConnectionsBy,
-    clearNetworkError,
-    clearCurrentConversation,
-    resetNetworkState,
-    simulateNetworkEvent,
-
     // Selectores
     selectNetworkState,
     selectAllMentors,
@@ -68,37 +35,11 @@ import {
     selectConnectionSuggestions,
     selectFeaturedUsers,
     selectNetworkStatus,
-    selectNetworkError,
-
-    // Selectores derivados
-    selectMentorsByAvailability,
-    selectMentorsBySkill,
-    selectAvailableMentorsNow,
-    selectCommunitiesByType,
-    selectCommunitiesByTopic,
-    selectConnectionsByStatus,
-    selectPendingConnections,
-    selectActiveConnections,
-    selectIsConnectedWithUser,
-    selectMessagesByConversation,
-    selectCurrentConversation,
-    selectCurrentConversationMessages,
-    selectUnreadConversations,
-    selectTotalUnreadMessages,
-    selectConversationWithUser,
-    selectMentorRequestsByStatus,
-    selectPendingMentorRequests,
-    selectAcceptedMentorRequests,
-    selectRejectedMentorRequests,
-    selectNetworkStatsSummary,
-    selectMentorsWithHighRating,
-    selectMentorsWithExperience,
-    selectRecentConnections,
-    selectRecentMessages,
-    selectMentorSuggestions
+    selectNetworkError
 } from '../slices/networkSlice'
 import { ConnectionStatus, MentorAvailability } from '@/api/services/networkService'
 
+// noinspection GrazieInspection
 /**
  * Hook personalizado para networking
  */

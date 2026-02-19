@@ -1,3 +1,5 @@
+// noinspection JSValidateTypes
+
 /**
  * @fileoverview Componente MentorCard para mostrar información de un mentor
  * Permite visualizar perfil del mentor y enviar solicitud de mentoría

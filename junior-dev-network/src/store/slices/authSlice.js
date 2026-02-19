@@ -1,9 +1,10 @@
 // store/slices/authSlice.js
+// noinspection DuplicatedCode,UnnecessaryLocalVariableJS,ExceptionCaughtLocallyJS
+
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { authService } from '@/api/services'
 import { STORAGE_KEYS } from '@/constants/apiConfig'
 import { LOADING_STATES } from '@/constants/apiConfig'
-import { APP_CONSTANTS } from '@/constants/appConstants'
 
 /**
  * @typedef {Object} User
